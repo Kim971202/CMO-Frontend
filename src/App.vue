@@ -45,6 +45,11 @@
                 >전기차 충전 이력</router-link
               >
             </li>
+            <li class="nav-item">
+              <router-link to="/complaint/list" class="nav-link"
+                >민원관리</router-link
+              >
+            </li>
           </ul>
           <div class="navbar-info">
             <div v-if="isLogin">

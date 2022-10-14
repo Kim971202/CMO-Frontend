@@ -1,22 +1,15 @@
+// v-on:click="fnView(`${row.idx}`)"
 <template>
   <div class="board">
-    <h2>택배</h2>
+    <h2>민원관리</h2>
     <div class="common-buttons"></div>
-    <button
-      type="button"
-      class="w3-button w3-round w3-teal"
-      v-on:click="fnWrite"
-    >
-      신규
-    </button>
     <table>
       <colgroup>
         <col style="width: 15%" />
+        <col style="width: 15%" />
+        <col style="width: 15%" />
         <col style="width: *" />
-        <col style="width: 15%" />
-        <col style="width: 15%" />
-        <col style="width: 15%" />
-        <col style="width: 15%" />
+        <col style="width: *" />
       </colgroup>
 
       <tbody>
@@ -44,13 +37,9 @@
               placeholder="호"
             />
           </td>
-          <th scope="row">수령여부</th>
+          <th scope="row">신청일자</th>
           <td>
-            <input type="text" ref="titleInput" v-model.trim="startDate" />
-          </td>
-          <th scope="row">통신결과</th>
-          <td>
-            <input type="text" ref="titleInput" v-model.trim="startDate" />
+            <input type="text" ref="titleInput" v-model.trim="appReceiptDate" />
           </td>
         </tr>
       </tbody>
@@ -73,13 +62,12 @@
     <div class="right">
       <button class="button blue" @click="fnSearch">검색</button>
       <button class="button" @click="fnList">취소</button>
+      <button type="button" @click="fnDelete">삭제</button>
     </div>
   </div>
-  <table></table>
+  <div class="text-uppercase text-bold">id selected: {{ selected }}</div>
   <table class="w3-table-all">
     <colgroup>
-      <col style="width: 10%" />
-      <col style="width: 10%" />
       <col style="width: 10%" />
       <col style="width: 10%" />
       <col style="width: 10%" />
@@ -90,41 +78,34 @@
     </colgroup>
     <thead>
       <tr>
-        <th>
-          <input type="checkbox" value="all" v-model="allSelected" />
-        </th>
+        <label class="form-checkbox">
+          <input type="checkbox" v-model="selectAll" @click="select" />
+          <i class="form-icon"></i>
+        </label>
         <th>No</th>
-        <th>동</th>
-        <th>호</th>
-        <th>구분</th>
-        <th>택배회사</th>
-        <th>도착일시</th>
-        <th>수령 일시</th>
-        <th>통신결과</th>
+        <th>신청일자</th>
+        <th>신청자</th>
+        <th>신청방법</th>
+        <th>접수일자</th>
+        <th>처리일자</th>
+        <th>상태</th>
       </tr>
     </thead>
     <tbody>
-      <input
-        type="checkbox"
-        :id="row"
-        :value="row"
-        v-model="selectList"
-        :key="i"
-      />
-      <label :for="row" :key="i + '1'"> {{ i }}</label>
-      <span>check: {{ selectList }}</span>
-
-      <tr v-on:click="fnView(`${row.idx}`)" v-for="(row, i) in list" :key="i">
-        <input type="checkbox" value="all" v-model="allSelected" />
-        <label for="all">전체</label>
-
-        <td>{{ row.dongCode }}</td>
-        <td>{{ row.hoCode }}</td>
-        <td>{{ row.parcelFlag }}</td>
-        <td>{{ row.parcelCorp }}</td>
-        <td>{{ row.arrivalTime }}</td>
-        <td>{{ row.receiveTime }}</td>
-        <td>{{ row.sendResult }}</td>
+      <tr class="hi" v-for="(row, i) in list" :key="i">
+        <td>
+          <label class="form-checkbox">
+            <input type="checkbox" :value="row.idx" v-model="selected" />
+            <i class="form-icon"></i>
+          </label>
+        </td>
+        <td>{{ row.No }}</td>
+        <td>{{ row.appReceiptDate }}</td>
+        <td>{{ row.applicant }}</td>
+        <td>{{ row.appMethod }}</td>
+        <td>{{ row.appReceiptDate }}</td>
+        <td>{{ row.appCompleteDate }}</td>
+        <td>{{ row.progressStatus }}</td>
       </tr>
     </tbody>
   </table>
@@ -186,6 +167,8 @@ export default {
   data() {
     //변수생성
     return {
+      selected: [],
+      selectAll: false,
       requestBody: {}, //리스트 페이지 데이터전송
       list: {}, //리스트 데이터
       no: "", //게시판 숫자처리
@@ -203,8 +186,8 @@ export default {
       endDate: this.$route.query.endDate,
       dongCode: this.$route.query.dongCode,
       hoCode: this.$route.query.hoCode,
-      parcelStatus: this.$route.query.parcelStatus,
-      sendResult: this.$route.query.sendResult,
+      appReceiptDate: this.$route.query.appReceiptDate,
+
       paginavigation: function () {
         //페이징 처리 for문 커스텀
         let pageNumber = []; //;
@@ -218,26 +201,20 @@ export default {
         }
         return pageNumber;
       },
-      checkList: ["e-mail", "SMS", "test1"],
-      selectList: [],
-      computed: {
-        allSelected: {
-          //getter
-          get: function () {
-            return this.checkList.length === this.selectList.length;
-          },
-          //setter
-          set: function (e) {
-            this.selectList = e ? this.checkList : [];
-          },
-        },
-      },
     };
   },
   mounted() {
     this.fnGetList();
   },
   methods: {
+    select() {
+      this.selected = [];
+      if (!this.selectAll) {
+        for (let i in this.list) {
+          this.selected.push(this.list[i].idx);
+        }
+      }
+    },
     fnGetList() {
       this.requestBody = {
         // 데이터 전송
@@ -247,11 +224,10 @@ export default {
         endDate: this.endDate,
         dongCode: this.dongCode,
         hoCode: this.hoCode,
-        parcelStatus: this.parcelStatus,
-        sendResult: this.sendResult,
+        appReceiptDate: this.appReceiptDate,
       };
       this.axios
-        .get(this.$serverUrl + "/parcel/getParcelList", {
+        .get(this.$serverUrl + "/complaint/getApplicationList", {
           params: this.requestBody,
           headers: {},
         })
@@ -273,18 +249,6 @@ export default {
             alert(err.message);
           }
         });
-    },
-    fnView(idx) {
-      this.requestBody.idx = idx;
-      this.$router.push({
-        path: "./detail",
-        query: this.requestBody,
-      });
-    },
-    fnWrite() {
-      this.$router.push({
-        path: "./insert",
-      });
     },
     fnSearch() {
       //검색
@@ -313,8 +277,54 @@ export default {
       this.size = 10;
       this.fnGetList();
     },
+    fnView(idx) {
+      this.requestBody.idx = idx;
+      this.$router.push({
+        path: "./detail",
+        query: this.requestBody,
+      });
+    },
+
+    //TODO: 삭제후 페이지 refresh 필요
+    fnDelete() {
+      var result = confirm("삭제하시겠습니까?");
+      console.log("this.selected.length: " + this.selected.length);
+
+      for (let i = 0; i < this.selected.length; ++i) {
+        // this.selected.push(this.list[i].idx);
+        if (result) {
+          this.axios
+            .delete(
+              this.$serverUrl +
+                "/complaint/deleteApplication/" +
+                this.list[i].idx,
+              {}
+            )
+            .then((res) => {
+              console.log("res.data.resultCode: " + res.data.resultCode);
+              if (res.data.resultCode == "00") {
+                alert("삭제되었습니다.");
+                //alert(JSON.stringify(res.data.resultMsg));
+                this.fnList();
+              } else {
+                alert("삭제되지 않았습니다.");
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
+      }
+    },
   },
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.hi:hover {
+  background-color: yellow;
+}
+body {
+  padding: 50px;
+}
+</style>

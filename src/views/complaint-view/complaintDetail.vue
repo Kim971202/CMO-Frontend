@@ -1,6 +1,6 @@
 <template>
   <div class="board">
-    <h2>택배 상세 조회</h2>
+    <h2>민원 상세 조회</h2>
     <table>
       <colgroup>
         <col style="width: 18.5%" />
@@ -8,24 +8,40 @@
       </colgroup>
       <tbody>
         <tr>
-          <th scope="row">도착일시</th>
-          <td class="title">{{ arrivalTime }}</td>
+          <th scope="row">신청일자</th>
+          <td class="title">{{ appDate }}</td>
         </tr>
         <tr>
-          <th scope="row">수령여부</th>
-          <td>{{ parcelStatus }}</td>
+          <th scope="row">민원유형</th>
+          <td>{{ appCode }}</td>
         </tr>
         <tr>
-          <th scope="row">동</th>
-          <td>{{ dongCode }}</td>
+          <th scope="row">민원내용</th>
+          <td>{{ appContent }}</td>
         </tr>
         <tr>
-          <th scope="row">호</th>
-          <td>{{ hoCode }}</td>
+          <th scope="row">신청자</th>
+          <td>{{ applicant }}</td>
+        </tr>
+        <tr>
+          <th scope="row">신청방법</th>
+          <td>{{ appMethod }}</td>
+        </tr>
+        <tr>
+          <th scope="row">접수일자</th>
+          <td>{{ appReceiptDate }}</td>
+        </tr>
+        <tr>
+          <th scope="row">처리일자</th>
+          <td>{{ appCompleteDate }}</td>
+        </tr>
+        <tr>
+          <th scope="row">진행상태</th>
+          <td>{{ progressStatus }}</td>
         </tr>
         <tr>
           <th scope="row">메모</th>
-          <td>{{ parcelCorp }}</td>
+          <td>{{ memo }}</td>
         </tr>
       </tbody>
     </table>
@@ -63,11 +79,15 @@ export default {
     return {
       requestBody: this.$route.query,
       idx: this.$route.query.idx,
-      arrivalTime: "",
-      parcelStatus: "",
-      dongCode: "",
-      hoCode: "",
-      parcelCorp: "",
+      appDate: "",
+      appCode: "",
+      appContent: "",
+      applicant: "",
+      appMethod: "",
+      appReceiptDate: "",
+      appCompleteDate: "",
+      progressStatus: "",
+      memo: "",
     };
   },
   mounted() {
@@ -76,15 +96,22 @@ export default {
   methods: {
     fnGetView() {
       this.axios
-        .get(this.$serverUrl + "/parcel/getDetailedParcelList/" + this.idx, {
-          params: this.requestBody,
-        })
+        .get(
+          this.$serverUrl + "/complaint/getDetailedApplicationList/" + this.idx,
+          {
+            params: this.requestBody,
+          }
+        )
         .then((res) => {
-          this.arrivalTime = res.data.arrivalTime;
-          this.parcelStatus = res.data.parcelStatus;
-          this.dongCode = res.data.dongCode;
-          this.hoCode = res.data.hoCode;
-          this.parcelCorp = res.data.parcelCorp;
+          this.appDate = res.data.appDate;
+          this.appCode = res.data.appCode;
+          this.appContent = res.data.appContent;
+          this.applicant = res.data.applicant;
+          this.appMethod = res.data.appMethod;
+          this.appReceiptDate = res.data.appReceiptDate;
+          this.appCompleteDate = res.data.appCompleteDate;
+          this.progressStatus = res.data.progressStatus;
+          this.memo = res.data.memo;
         })
         .catch((err) => {
           if (err.message.indexOf("Network Error") > -1) {

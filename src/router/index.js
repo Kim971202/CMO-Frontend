@@ -119,6 +119,18 @@ const routes = [
     component: () => import("../views/elecCar-view/elecCarList.vue"),
     meta: { requireLogin: true },
   },
+  {
+    path: "/complaint/list",
+    name: "complaintList",
+    component: () => import("../views/complaint-view/complaintList.vue"),
+    meta: { requireLogin: true },
+  },
+  {
+    path: "/complaint/detail",
+    name: "complaintDetail",
+    component: () => import("../views/complaint-view/complaintDetail.vue"),
+    meta: { requireLogin: true },
+  },
 ];
 
 const router = createRouter({
