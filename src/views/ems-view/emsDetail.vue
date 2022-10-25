@@ -1,6 +1,6 @@
 <template>
   <div class="board">
-    <h2>에너지 관리</h2>
+    <h2>에너지 관리 상세 조회</h2>
     <div class="common-buttons"></div>
     <table>
       <colgroup>
@@ -8,45 +8,7 @@
         <col style="width: 10%" />
         <col style="width: 10%" />
         <col style="width: 10%" />
-        <col style="width: *" />
-        <col style="width: *" />
       </colgroup>
-
-      <tbody>
-        <tr>
-          <th scope="row">기간별조회</th>
-          <td>
-            <input type="text" ref="titleInput" v-model.trim="startDate" />
-          </td>
-          <th scope="row">에너지유형</th>
-          <td>
-            <input type="text" ref="authorInput" v-model.trim="energyType" />
-          </td>
-          <th scope="row">시작일자</th>
-          <td>
-            <input type="text" ref="authorInput" v-model.trim="startDate" />
-          </td>
-          <th scope="row">종료일자</th>
-          <td>
-            <input type="text" ref="authorInput" v-model.trim="endDate" />
-          </td>
-          <th scope="row">동 / 호</th>
-          <td>
-            <input
-              type="text"
-              ref="authorInput"
-              v-model.trim="dongCode"
-              placeholder="동"
-            />
-            <input
-              type="text"
-              ref="authorInput"
-              v-model.trim="hoCode"
-              placeholder="호"
-            />
-          </td>
-        </tr>
-      </tbody>
       <tbody>
         <tr>
           <th scope="row">검색단위</th>
@@ -65,11 +27,8 @@
   <div class="buttons">
     <div class="right">
       <button class="button blue" @click="fnSearch">검색</button>
-      <button class="button" @click="fnList">취소</button>
-      <button type="button" @click="fnDelete">삭제</button>
     </div>
   </div>
-  <div class="text-uppercase text-bold">id selected: {{ selected }}</div>
   <table class="w3-table-all">
     <colgroup>
       <col style="width: 10%" />
@@ -82,13 +41,8 @@
     </colgroup>
     <thead>
       <tr>
-        <label class="form-checkbox">
-          <input type="checkbox" v-model="selectAll" @click="select" />
-          <i class="form-icon"></i>
-        </label>
         <th>No</th>
-        <th>월</th>
-        <th>세대</th>
+        <th>일자</th>
         <th>
           전기
           <tr>
@@ -124,27 +78,12 @@
             <th>사용</th>
           </tr>
         </th>
-        <th>
-          기타
-          <tr>
-            <th>검침</th>
-            <th>사용</th>
-          </tr>
-        </th>
       </tr>
     </thead>
     <tbody>
       <tr class="hi" v-for="(row, i) in list" :key="i">
-        <td>
-          <label class="form-checkbox">
-            <input type="checkbox" :value="row.idx" v-model="selected" />
-            <i class="form-icon"></i>
-          </label>
-        </td>
-        <a v-on:click="fnView(`${row.date}`)">{{ row.No }}</a>
         <td>{{ row.No }}</td>
-        <td>{{ row.month }}</td>
-        <td>{{ row.dongHo }}</td>
+        <td>{{ row.date }}</td>
         <th>
             <td>{{ row.elecMeter }}</td>
             <td>{{ row.elecUsage }}</td>
@@ -165,11 +104,6 @@
             <td>{{ row.heatingMeter }}</td>
             <td>{{ row.heatingUsage }}</td>
         </th>
-        <th>
-            <td> 0.00 </td>
-            <td> 0.00 </td>
-        </th>
-
       </tr>
     </tbody>
   </table>
@@ -289,7 +223,7 @@ export default {
         hoCode: this.hoCode,
       };
       this.axios
-        .get(this.$serverUrl + "/ems/getEMS", {
+        .get(this.$serverUrl + "/ems/getDetailedEMS", {
           params: this.requestBody,
           headers: {},
         })
@@ -339,8 +273,8 @@ export default {
       this.size = 10;
       this.fnGetList();
     },
-    fnView(date) {
-      this.requestBody.date = date;
+    fnView(idx) {
+      this.requestBody.idx = idx;
       this.$router.push({
         path: "./detail",
         query: this.requestBody,

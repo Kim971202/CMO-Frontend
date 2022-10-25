@@ -138,6 +138,12 @@ const routes = [
     meta: { requireLogin: true },
   },
   {
+    path: "/ems/detail",
+    name: "emsDetail",
+    component: () => import("../views/ems-view/emsDetail.vue"),
+    meta: { requireLogin: true },
+  },
+  {
     path: "/notice/list",
     name: "noticeList",
     component: () => import("../views/notice-view/noticeList.vue"),
