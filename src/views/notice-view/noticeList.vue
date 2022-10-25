@@ -1,7 +1,13 @@
-// v-on:click="fnView(`${row.idx}`)"
+<!-- 
+    최초 작정자: 김동현
+    최초 작성일자: 2022년10월21일
+
+    최근 수정자: 김동현
+    최근 수정일자: 2022년10월21일
+-->
 <template>
   <div class="board">
-    <h2>민원관리</h2>
+    <h2>공지사항</h2>
     <div class="common-buttons"></div>
     <table>
       <colgroup>
@@ -37,7 +43,11 @@
               placeholder="호"
             />
           </td>
-          <th scope="row">신청일자</th>
+          <th scope="row">공지유형</th>
+          <td>
+            <input type="text" ref="titleInput" v-model.trim="appReceiptDate" />
+          </td>
+          <th scope="row">월패드알림</th>
           <td>
             <input type="text" ref="titleInput" v-model.trim="appReceiptDate" />
           </td>
@@ -71,10 +81,10 @@
       <col style="width: 10%" />
       <col style="width: 10%" />
       <col style="width: 10%" />
+      <col style="width: *" />
       <col style="width: 10%" />
       <col style="width: 10%" />
-      <col style="width: 10%" />
-      <col style="width: 10%" />
+      <col style="width: *" />
     </colgroup>
     <thead>
       <tr>
@@ -83,12 +93,12 @@
           <i class="form-icon"></i>
         </label>
         <th>No</th>
-        <th>신청일자</th>
-        <th>신청자</th>
-        <th>신청방법</th>
-        <th>접수일자</th>
-        <th>처리일자</th>
-        <th>상태</th>
+        <th>공지유형</th>
+        <th>공지제목</th>
+        <th>작성자</th>
+        <th>게시일자</th>
+        <th>만료일자</th>
+        <th>알림</th>
       </tr>
     </thead>
     <tbody>
@@ -99,13 +109,14 @@
             <i class="form-icon"></i>
           </label>
         </td>
+        <a v-on:click="fnView(`${row.idx}`)">{{ row.No }}</a>
         <td>{{ row.No }}</td>
-        <td>{{ row.appReceiptDate }}</td>
-        <td>{{ row.applicant }}</td>
-        <td>{{ row.appMethod }}</td>
-        <td>{{ row.appReceiptDate }}</td>
-        <td>{{ row.appCompleteDate }}</td>
-        <td>{{ row.progressStatus }}</td>
+        <td>{{ row.notiType }}</td>
+        <td>{{ row.notiTitle }}</td>
+        <td>{{ row.notiOwner }}</td>
+        <td>{{ row.startDate }}</td>
+        <td>{{ row.endDate }}</td>
+        <td>{{ row.sendResult }}</td>
       </tr>
     </tbody>
   </table>
@@ -184,9 +195,9 @@ export default {
       size: this.$route.query.size ? this.$route.query.size : 10,
       startDate: this.$route.query.startDate,
       endDate: this.$route.query.endDate,
-      dongCode: this.$route.query.dongCode,
-      hoCode: this.$route.query.hoCode,
-      appReceiptDate: this.$route.query.appReceiptDate,
+      notiType: this.$route.query.notiType,
+      notiContent: this.$route.query.notiContent,
+      sendResult: this.$route.query.sendResult,
 
       paginavigation: function () {
         //페이징 처리 for문 커스텀
@@ -222,12 +233,12 @@ export default {
         size: this.size,
         startDate: this.startDate,
         endDate: this.endDate,
-        dongCode: this.dongCode,
-        hoCode: this.hoCode,
-        appReceiptDate: this.appReceiptDate,
+        notiType: this.notiType,
+        notiContent: this.notiContent,
+        sendResult: this.sendResult,
       };
       this.axios
-        .get(this.$serverUrl + "/complaint/getApplicationList", {
+        .get(this.$serverUrl + "/notice/getNoticeList", {
           params: this.requestBody,
           headers: {},
         })

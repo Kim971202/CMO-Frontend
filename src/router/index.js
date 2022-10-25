@@ -131,6 +131,24 @@ const routes = [
     component: () => import("../views/complaint-view/complaintDetail.vue"),
     meta: { requireLogin: true },
   },
+  {
+    path: "/ems/list",
+    name: "emsList",
+    component: () => import("../views/ems-view/emsList.vue"),
+    meta: { requireLogin: true },
+  },
+  {
+    path: "/notice/list",
+    name: "noticeList",
+    component: () => import("../views/notice-view/noticeList.vue"),
+    meta: { requireLogin: true },
+  },
+  {
+    path: "/notice/detail",
+    name: "noticeDetail",
+    component: () => import("../views/notice-view/noticeDetail.vue"),
+    meta: { requireLogin: true },
+  },
 ];
 
 const router = createRouter({

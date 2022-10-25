@@ -1,22 +1,30 @@
-// v-on:click="fnView(`${row.idx}`)"
 <template>
   <div class="board">
-    <h2>민원관리</h2>
+    <h2>에너지 관리</h2>
     <div class="common-buttons"></div>
     <table>
       <colgroup>
-        <col style="width: 15%" />
-        <col style="width: 15%" />
-        <col style="width: 15%" />
+        <col style="width: 10%" />
+        <col style="width: 10%" />
+        <col style="width: 10%" />
+        <col style="width: 10%" />
         <col style="width: *" />
         <col style="width: *" />
       </colgroup>
 
       <tbody>
         <tr>
-          <th scope="row">시작일자</th>
+          <th scope="row">기간별조회</th>
           <td>
             <input type="text" ref="titleInput" v-model.trim="startDate" />
+          </td>
+          <th scope="row">에너지유형</th>
+          <td>
+            <input type="text" ref="authorInput" v-model.trim="energyType" />
+          </td>
+          <th scope="row">시작일자</th>
+          <td>
+            <input type="text" ref="authorInput" v-model.trim="startDate" />
           </td>
           <th scope="row">종료일자</th>
           <td>
@@ -36,10 +44,6 @@
               v-model.trim="hoCode"
               placeholder="호"
             />
-          </td>
-          <th scope="row">신청일자</th>
-          <td>
-            <input type="text" ref="titleInput" v-model.trim="appReceiptDate" />
           </td>
         </tr>
       </tbody>
@@ -83,12 +87,50 @@
           <i class="form-icon"></i>
         </label>
         <th>No</th>
-        <th>신청일자</th>
-        <th>신청자</th>
-        <th>신청방법</th>
-        <th>접수일자</th>
-        <th>처리일자</th>
-        <th>상태</th>
+        <th>월</th>
+        <th>세대</th>
+        <th>
+          전기
+          <tr>
+            <th>검침</th>
+            <th>사용</th>
+          </tr>
+        </th>
+        <th>
+          수도
+          <tr>
+            <th>검침</th>
+            <th>사용</th>
+          </tr>
+        </th>
+        <th>
+          가스
+          <tr>
+            <th>검침</th>
+            <th>사용</th>
+          </tr>
+        </th>
+        <th>
+          온수
+          <tr>
+            <th>검침</th>
+            <th>사용</th>
+          </tr>
+        </th>
+        <th>
+          난방
+          <tr>
+            <th>검침</th>
+            <th>사용</th>
+          </tr>
+        </th>
+        <th>
+          기타
+          <tr>
+            <th>검침</th>
+            <th>사용</th>
+          </tr>
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -100,12 +142,33 @@
           </label>
         </td>
         <td>{{ row.No }}</td>
-        <td>{{ row.appReceiptDate }}</td>
-        <td>{{ row.applicant }}</td>
-        <td>{{ row.appMethod }}</td>
-        <td>{{ row.appReceiptDate }}</td>
-        <td>{{ row.appCompleteDate }}</td>
-        <td>{{ row.progressStatus }}</td>
+        <td>{{ row.month }}</td>
+        <td>{{ row.hoCode }}</td>
+        <th>
+            <td>{{ row.elecMeter }}</td>
+            <td>{{ row.elecUsage }}</td>
+        </th>
+        <th>
+            <td>{{ row.waterMeter }}</td>
+            <td>{{ row.waterUsage }}</td>
+        </th>
+        <th>
+            <td>{{ row.gasMeter }}</td>
+            <td>{{ row.gasUsage }}</td>
+        </th>
+        <th>
+            <td>{{ row.hotWaterMeter }}</td>
+            <td>{{ row.hotWaterUsage }}</td>
+        </th>
+        <th>
+            <td>{{ row.heatingMeter }}</td>
+            <td>{{ row.heatingUsage }}</td>
+        </th>
+        <th>
+            <td> 0.00 </td>
+            <td> 0.00 </td>
+        </th>
+
       </tr>
     </tbody>
   </table>
@@ -186,7 +249,6 @@ export default {
       endDate: this.$route.query.endDate,
       dongCode: this.$route.query.dongCode,
       hoCode: this.$route.query.hoCode,
-      appReceiptDate: this.$route.query.appReceiptDate,
 
       paginavigation: function () {
         //페이징 처리 for문 커스텀
@@ -224,10 +286,9 @@ export default {
         endDate: this.endDate,
         dongCode: this.dongCode,
         hoCode: this.hoCode,
-        appReceiptDate: this.appReceiptDate,
       };
       this.axios
-        .get(this.$serverUrl + "/complaint/getApplicationList", {
+        .get(this.$serverUrl + "/ems/getEMS", {
           params: this.requestBody,
           headers: {},
         })
