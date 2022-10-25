@@ -16,31 +16,31 @@
         <tr>
           <th scope="row">기간별조회</th>
           <td>
-            <input type="text" ref="titleInput" v-model.trim="startDate" />
+            <input type="text" ref="titleInput" v-model.trim="df" />
           </td>
           <th scope="row">에너지유형</th>
           <td>
-            <input type="text" ref="authorInput" v-model.trim="energyType" />
+            <input type="text" ref="energyTypeInput" v-model.trim="energyType" />
           </td>
           <th scope="row">시작일자</th>
           <td>
-            <input type="text" ref="authorInput" v-model.trim="startDate" />
+            <input type="text" ref="startDateInput" v-model.trim="startDate" />
           </td>
           <th scope="row">종료일자</th>
           <td>
-            <input type="text" ref="authorInput" v-model.trim="endDate" />
+            <input type="text" ref="endDateInput" v-model.trim="endDate" />
           </td>
           <th scope="row">동 / 호</th>
           <td>
             <input
               type="text"
-              ref="authorInput"
+              ref="dongCodeInput"
               v-model.trim="dongCode"
               placeholder="동"
             />
             <input
               type="text"
-              ref="authorInput"
+              ref="hoCodeInput"
               v-model.trim="hoCode"
               placeholder="호"
             />
@@ -339,46 +339,37 @@ export default {
     fnList() {
       this.page = 1;
       this.size = 10;
+      this.startDate = "";
       this.fnGetList();
     },
     fnView(date) {
+      console.log(this.startDate)
+      if(this.startDate === undefined){
+        alert("시작일을 입력하세요.");
+        this.$refs.startDateInput.focus();
+        return;
+      } else if (this.endDate === undefined){
+        alert("종료일을 입력하세요.");
+        this.$refs.endDateInput.focus();
+        return;
+      }else if (this.dongCode === undefined){
+        alert("종료일을 입력하세요.");
+        this.$refs.dongCodeInput.focus();
+        return;
+      }else if (this.hoCode === undefined){
+        alert("종료일을 입력하세요.");
+        this.$refs.hoCodeInput.focus();
+        return;
+      }else if (this.energyType === undefined){
+        alert("종료일을 입력하세요.");
+        this.$refs.endDateInput.focus();
+        return;
+      }
       this.requestBody.date = date;
       this.$router.push({
         path: "./detail",
         query: this.requestBody,
       });
-    },
-
-    //TODO: 삭제후 페이지 refresh 필요
-    fnDelete() {
-      var result = confirm("삭제하시겠습니까?");
-      console.log("this.selected.length: " + this.selected.length);
-      // let selectedItems = this.selected.length;
-      for (let i = 0; i < this.selected.length; ++i) {
-        // this.selected.push(this.list[i].idx);
-        if (result) {
-          this.axios
-            .delete(
-              this.$serverUrl +
-                "/complaint/deleteApplication/" +
-                this.list[i].idx,
-              {}
-            )
-            .then((res) => {
-              console.log("res.data.resultCode: " + res.data.resultCode);
-              if (res.data.resultCode == "00") {
-                alert("삭제되었습니다.");
-                //alert(JSON.stringify(res.data.resultMsg));
-                this.fnList();
-              } else {
-                alert("삭제되지 않았습니다.");
-              }
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        }
-      }
     },
   },
 };
