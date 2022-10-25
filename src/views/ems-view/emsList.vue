@@ -142,7 +142,7 @@
           </label>
         </td>
         <a v-on:click="fnView(`${row.date}`)">{{ row.No }}</a>
-        <td>{{ row.No }}</td>
+        
         <td>{{ row.month }}</td>
         <td>{{ row.dongHo }}</td>
         <th>
@@ -250,6 +250,7 @@ export default {
       endDate: this.$route.query.endDate,
       dongCode: this.$route.query.dongCode,
       hoCode: this.$route.query.hoCode,
+      energyType: this.$route.query.energyType,
 
       paginavigation: function () {
         //페이징 처리 for문 커스텀
@@ -287,6 +288,7 @@ export default {
         endDate: this.endDate,
         dongCode: this.dongCode,
         hoCode: this.hoCode,
+        energyType: this.energyType,
       };
       this.axios
         .get(this.$serverUrl + "/ems/getEMS", {
