@@ -155,6 +155,18 @@ const routes = [
     component: () => import("../views/notice-view/noticeDetail.vue"),
     meta: { requireLogin: true },
   },
+  {
+    path: "/vote/list",
+    name: "voteList",
+    component: () => import("../views/vote-view/voteList.vue"),
+    meta: { requireLogin: true },
+  },
+  {
+    path: "/vote/detail",
+    name: "voteDetail",
+    component: () => import("../views/vote-view/voteDetail.vue"),
+    meta: { requireLogin: true },
+  },
 ];
 
 const router = createRouter({

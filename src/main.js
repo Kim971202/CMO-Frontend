@@ -12,8 +12,9 @@ import store from "./store";
 import "bootstrap"; // 추가
 import "bootstrap/dist/css/bootstrap.min.css"; // 추가
 import "bootstrap-icons/font/bootstrap-icons.css"; // 추가
+import VueJsonToTable from "vue-json-to-table";
 
-const app = createApp(App).use(router).use(store);
+const app = createApp(App).use(router).use(store).use(VueJsonToTable);
 app.config.globalProperties.axios = axios;
 app.config.globalProperties.$serverUrl = "//localhost:9000"; //API서버
 app.mount("#app");

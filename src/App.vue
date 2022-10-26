@@ -58,6 +58,11 @@
                 >공지사항</router-link
               >
             </li>
+            <li class="nav-item">
+              <router-link to="/vote/list" class="nav-link"
+                >주민투표</router-link
+              >
+            </li>
           </ul>
           <div class="navbar-info">
             <div v-if="isLogin">
