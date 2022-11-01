@@ -5,14 +5,12 @@
     <table>
       <colgroup>
         <col style="width: 10%" />
-        <col style="width: 10%" />
-        <col style="width: 10%" />
-        <col style="width: 10%" />
+        <col style="width: *" />
       </colgroup>
       <tbody>
         <tr>
           <th scope="row">검색단위</th>
-          <td colspan="2">
+          <td colspan="3">
             <input
               type="text"
               ref="sizeInput"
@@ -298,22 +296,18 @@ export default {
     fnDelete() {
       var result = confirm("삭제하시겠습니까?");
       console.log("this.selected.length: " + this.selected.length);
-      // let selectedItems = this.selected.length;
-      for (let i = 0; i < this.selected.length; ++i) {
-        // this.selected.push(this.list[i].idx);
         if (result) {
           this.axios
             .delete(
               this.$serverUrl +
-                "/complaint/deleteApplication/" +
-                this.list[i].idx,
+                "/vote/deleteApplication/" +
+                this.idx,
               {}
             )
             .then((res) => {
               console.log("res.data.resultCode: " + res.data.resultCode);
               if (res.data.resultCode == "00") {
                 alert("삭제되었습니다.");
-                //alert(JSON.stringify(res.data.resultMsg));
                 this.fnList();
               } else {
                 alert("삭제되지 않았습니다.");
@@ -323,7 +317,6 @@ export default {
               console.log(err);
             });
         }
-      }
     },
   },
 };

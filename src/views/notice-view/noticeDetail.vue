@@ -1,6 +1,6 @@
 <template>
   <div class="board">
-    <h2>공지사항 상세 조회</h2>
+    <h2>공지사항</h2>
     <table>
       <colgroup>
         <col style="width: 18.5%" />
@@ -8,24 +8,36 @@
       </colgroup>
       <tbody>
         <tr>
-          <th scope="row">제목</th>
-          <td class="title">{{ notiTitle }}</td>
+          <th scope="row">공지 제목</th>
+          <td>{{ notiTitle }}</td>
+          <td></td>
+          <td></td>
+          <td></td>
         </tr>
         <tr>
           <th scope="row">게시일자</th>
-          <td>{{ startDate }}</td>
-        </tr>
-        <tr>
+          <td>{{ startDate.replace("T", " ") }}</td>
           <th scope="row">만료일자</th>
-          <td>{{ endDate }}</td>
+          <td>{{ endDate.replace("T", " ") }}</td>
+          <td></td>
         </tr>
         <tr>
-          <th scope="row">월패드 알림</th>
+          <th scope="row">월패드알림</th>
           <td>{{ sendResult }}</td>
-        </tr>
-        <tr>
           <th scope="row">공지대상</th>
           <td>{{ notiType }}</td>
+          <td></td>
+        </tr>
+        <tr>
+          <th scope="row">첨부파일</th>
+          <input type="file" />
+        </tr>
+        <tr>
+          <th scope="row">공지 내용</th>
+          <td>{{ notiContent }}</td>
+          <td></td>
+          <td></td>
+          <td></td>
         </tr>
       </tbody>
     </table>
@@ -68,6 +80,9 @@ export default {
       endDate: "",
       sendResult: "",
       notiType: "",
+      notiContent: "",
+      fileName: "",
+      items: [],
     };
   },
   mounted() {
@@ -76,7 +91,7 @@ export default {
   methods: {
     fnGetView() {
       this.axios
-        .get(this.$serverUrl + "/notice/getDetailedNoticeList/", {
+        .get(this.$serverUrl + "/notice/getDetailedNoticeList/" + this.idx, {
           params: this.requestBody,
         })
         .then((res) => {
@@ -85,6 +100,8 @@ export default {
           this.endDate = res.data.endDate;
           this.sendResult = res.data.sendResult;
           this.notiType = res.data.notiType;
+          this.notiContent = res.data.notiContent;
+          this.fileName = res.data.fileName;
         })
         .catch((err) => {
           if (err.message.indexOf("Network Error") > -1) {
@@ -109,7 +126,7 @@ export default {
       var result = confirm("삭제하시겠습니까?");
       if (result) {
         this.axios
-          .delete(this.$serverUrl + "/parcel/deleteParcel/" + this.idx, {})
+          .delete(this.$serverUrl + "/notice/deleteNotice/" + this.idx, {})
           .then((res) => {
             console.log("res.data.resultCode: " + res.data.resultCode);
             if (res.data.resultCode == "00") {

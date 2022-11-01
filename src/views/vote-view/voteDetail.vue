@@ -51,11 +51,26 @@
       >&nbsp;
       <button
         type="button"
-        class="w3-button w3-round w3-gray"
+        class="w3-button w3-round w3-blue"
         v-on:click="fnList"
       >
-        목록
+        투표마감</button
+      >&nbsp;
+      <button
+        type="button"
+        class="w3-button w3-round w3-green"
+        v-on:click="fnList"
+      >
+        결과보기
       </button>
+      &nbsp;
+      <button
+        type="button"
+        class="w3-button w3-round w3-black"
+        v-on:click="fnList"
+      >
+        종료</button
+      >&nbsp;
     </div>
   </div>
 </template>
@@ -111,12 +126,11 @@ export default {
       var result = confirm("삭제하시겠습니까?");
       if (result) {
         this.axios
-          .delete(this.$serverUrl + "/vueboard/delete/" + this.idx, {})
+          .delete(this.$serverUrl + "/vote/deleteVoteAgenda/" + this.idx, {})
           .then((res) => {
             console.log("res.data.resultCode: " + res.data.resultCode);
             if (res.data.resultCode == "00") {
               alert("삭제되었습니다.");
-              //alert(JSON.stringify(res.data.resultMsg));
               this.fnList();
             } else {
               alert("삭제되지 않았습니다.");

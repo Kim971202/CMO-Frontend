@@ -4,60 +4,95 @@
     <div class="common-buttons"></div>
     <table>
       <colgroup>
-        <col style="width: 10%" />
-        <col style="width: 10%" />
-        <col style="width: 10%" />
-        <col style="width: 10%" />
         <col style="width: *" />
         <col style="width: *" />
-      </colgroup>
+        <col style="width: *" />
+        <col style="width: *" />
 
+      </colgroup>
       <tbody>
         <tr>
-          <th scope="row">기간별조회</th>
-          <td>
-            <input type="text" ref="titleInput" v-model.trim="df" />
+          <th scope="row">조회기간</th>
+          <td style="float: center">
+  
+            <input
+              type="date"
+              style="width: 150px; text-align: center"
+              v-model.trim="startDate"
+            />
+            ~
+            <input
+              type="date"
+              style="width: 150px; text-align: center"
+              v-bind:disabled="moveOutDtime == ''"
+              v-model.trim="endDate"
+            />
           </td>
+          <th scope="row">동호</th>
+          <td style="float: center">
+            <select
+              v-model="dongCode"
+              @change="onChange($event)"
+              style="width: 100px; height: 25px; text-align: center"
+            >
+              <option value="">---전체---</option>
+              <option
+                v-for="model in dong_items"
+                :key="model.code"
+                :value="model.code"
+              >
+                {{ model.name }}
+              </option>
+            </select>
+            동&nbsp;&nbsp;
+            <select
+              v-model="hoCode"
+              style="width: 100px; height: 25px; text-align: center"
+            >
+              <option value="">---전체---</option>
+              <option
+                v-for="model in ho_items"
+                :key="model.code"
+                :value="model.code"
+              >
+                {{ model.name }}
+              </option>
+            </select>
+            &nbsp;&nbsp;호
+          </td>
+          <td></td>
+        <td></td>
+        </tr>
+         
+        <tr>
           <th scope="row">에너지유형</th>
           <td>
-            <input type="text" ref="energyTypeInput" v-model.trim="energyType" />
+            <select
+              v-model="energyType"
+              style="width: 150px; height: 25px; text-align: center"
+            >
+              <option value="">----전체----</option>
+              <option
+                v-for="model in ems_items"
+                :key="model.energyType"
+                :value="model.energyType"
+              >
+                {{ model.energyType }}
+              </option>
+            </select>
           </td>
-          <th scope="row">시작일자</th>
-          <td>
-            <input type="text" ref="startDateInput" v-model.trim="startDate" />
-          </td>
-          <th scope="row">종료일자</th>
-          <td>
-            <input type="text" ref="endDateInput" v-model.trim="endDate" />
-          </td>
-          <th scope="row">동 / 호</th>
-          <td>
-            <input
-              type="text"
-              ref="dongCodeInput"
-              v-model.trim="dongCode"
-              placeholder="동"
-            />
-            <input
-              type="text"
-              ref="hoCodeInput"
-              v-model.trim="hoCode"
-              placeholder="호"
-            />
-          </td>
-        </tr>
-      </tbody>
-      <tbody>
-        <tr>
           <th scope="row">검색단위</th>
-          <td colspan="2">
+          <td>
             <input
               type="text"
+              style="width: 150px; text-align: center"
               ref="sizeInput"
               v-model="size"
               @keyup.enter="fnSearch"
             />
           </td>
+          <td></td>
+          <td></td>    
         </tr>
       </tbody>
     </table>
@@ -66,10 +101,8 @@
     <div class="right">
       <button class="button blue" @click="fnSearch">검색</button>
       <button class="button" @click="fnList">취소</button>
-      <button type="button" @click="fnDelete">삭제</button>
     </div>
   </div>
-  <div class="text-uppercase text-bold">id selected: {{ selected }}</div>
   <table class="w3-table-all">
     <colgroup>
       <col style="width: 10%" />
@@ -82,10 +115,6 @@
     </colgroup>
     <thead>
       <tr>
-        <label class="form-checkbox">
-          <input type="checkbox" v-model="selectAll" @click="select" />
-          <i class="form-icon"></i>
-        </label>
         <th>No</th>
         <th>월</th>
         <th>세대</th>
@@ -131,18 +160,12 @@
             <th>사용</th>
           </tr>
         </th>
+        <th>수정보기</th>
       </tr>
     </thead>
     <tbody>
       <tr class="hi" v-for="(row, i) in list" :key="i">
-        <td>
-          <label class="form-checkbox">
-            <input type="checkbox" :value="row.idx" v-model="selected" />
-            <i class="form-icon"></i>
-          </label>
-        </td>
-        <a v-on:click="fnView(`${row.date}`)">{{ row.No }}</a>
-        
+        <td>{{ row.No }}</td>
         <td>{{ row.month }}</td>
         <td>{{ row.dongHo }}</td>
         <th>
@@ -169,7 +192,17 @@
             <td> 0.00 </td>
             <td> 0.00 </td>
         </th>
-
+        <td>
+          <div class="table-button-container">
+            <button
+              class="w3-button w3-round w3-green"
+              v-on:click="fnView(`${row.idx}`)"
+            >
+              <i class="fa fa-remove"></i>상세</button
+            >&nbsp;&nbsp;
+          </div>
+        </td>
+      
       </tr>
     </tbody>
   </table>
@@ -236,6 +269,9 @@ export default {
       requestBody: {}, //리스트 페이지 데이터전송
       list: {}, //리스트 데이터
       no: "", //게시판 숫자처리
+      dong_items: [],
+      ho_items: [],
+      items: [],
       paging: {
         totalCount: 0,
         total_page: 0,
@@ -268,7 +304,9 @@ export default {
     };
   },
   mounted() {
+    this.fnGetDong();
     this.fnGetList();
+    this.fnGetEnergyType();
   },
   methods: {
     select() {
@@ -278,6 +316,43 @@ export default {
           this.selected.push(this.list[i].idx);
         }
       }
+    },
+    fnGetEnergyType() {
+      this.axios
+        .get(this.$serverUrl + "/ems/energyList")
+        .then((res) => {
+          this.ems_items = res.data.items;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    fnGetDong() {
+      this.axios
+        .get(this.$serverUrl + "/donghoInfo/dongList")
+        .then((res) => {
+          this.dong_items = res.data.items;
+          //alert(JSON.stringify(this.items));
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    onChange(event) {
+      console.log("event =>" + event.target.value);
+      //alert(this.dongCode);
+      this.fnGetDongho(this.dongCode);
+    },
+    fnGetDongho(dongCode) {
+      this.axios
+        .get(this.$serverUrl + "/donghoInfo/donghoList?dongCode=" + dongCode)
+        .then((res) => {
+          this.ho_items = res.data.items;
+          //alert(JSON.stringify(this.items));
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
     fnGetList() {
       this.requestBody = {
@@ -340,6 +415,10 @@ export default {
       this.page = 1;
       this.size = 10;
       this.startDate = "";
+      this.endDate = "";
+      this.dongCode = "";
+      this.hoCode = "";
+      this.energyType = "";
       this.fnGetList();
     },
     fnView(date) {
@@ -353,15 +432,15 @@ export default {
         this.$refs.endDateInput.focus();
         return;
       }else if (this.dongCode === undefined){
-        alert("종료일을 입력하세요.");
+        alert("동 정보를 입력하세요.");
         this.$refs.dongCodeInput.focus();
         return;
       }else if (this.hoCode === undefined){
-        alert("종료일을 입력하세요.");
+        alert("호 정보를 입력하세요.");
         this.$refs.hoCodeInput.focus();
         return;
       }else if (this.energyType === undefined){
-        alert("종료일을 입력하세요.");
+        alert("에너지유형을 입력하세요.");
         this.$refs.endDateInput.focus();
         return;
       }

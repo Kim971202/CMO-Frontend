@@ -23,13 +23,8 @@
               <router-link to="/" class="nav-link">Home</router-link>
             </li>
             <li class="nav-item">
-              <router-link :to="{ name: 'BoardList' }" class="nav-link"
-                >Board</router-link
-              >
-            </li>
-            <li class="nav-item">
-              <router-link to="/board/list" class="nav-link"
-                >sBoard</router-link
+              <router-link to="/donghoInfo/list" class="nav-link"
+                >동호정보</router-link
               >
             </li>
             <li class="nav-item">
@@ -61,6 +56,11 @@
             <li class="nav-item">
               <router-link to="/vote/list" class="nav-link"
                 >주민투표</router-link
+              >
+            </li>
+            <li class="nav-item">
+              <router-link to="/mngFee/list" class="nav-link"
+                >관리비</router-link
               >
             </li>
           </ul>

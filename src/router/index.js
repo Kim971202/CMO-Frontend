@@ -156,6 +156,12 @@ const routes = [
     meta: { requireLogin: true },
   },
   {
+    path: "/notice/insert",
+    name: "noticeInsert",
+    component: () => import("../views/notice-view/noticeInsert.vue"),
+    meta: { requireLogin: true },
+  },
+  {
     path: "/vote/list",
     name: "voteList",
     component: () => import("../views/vote-view/voteList.vue"),
@@ -165,6 +171,30 @@ const routes = [
     path: "/vote/detail",
     name: "voteDetail",
     component: () => import("../views/vote-view/voteDetail.vue"),
+    meta: { requireLogin: true },
+  },
+  {
+    path: "/mngFee/list",
+    name: "mngFeeList",
+    component: () => import("../views/mngFee-view/mngFeeList.vue"),
+    meta: { requireLogin: true },
+  },
+  {
+    path: "/mngFee/detail",
+    name: "mngFeeDetail",
+    component: () => import("../views/mngFee-view/mngFeeDetail.vue"),
+    meta: { requireLogin: true },
+  },
+  {
+    path: "/donghoInfo/list",
+    name: "donghoInfoList",
+    component: () => import("../views/donghoInfo/donghoInfoList.vue"),
+    meta: { requireLogin: true },
+  },
+  {
+    path: "/donghoInfo/update",
+    name: "donghoInfoUpdate",
+    component: () => import("../views/donghoInfo/donghoInfoUpdate.vue"),
     meta: { requireLogin: true },
   },
 ];

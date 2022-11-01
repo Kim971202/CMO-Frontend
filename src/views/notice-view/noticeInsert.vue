@@ -1,178 +1,327 @@
 <template>
-    <div class="board">
-      <h1>공지사항 업로드</h1>
-      <table>
-        <colgroup>
-          <col style="width: 10%" />
-          <col style="width: auto" />
-        
-        </colgroup>
-        <tbody>
+  <div class="board">
+    <h1>공지사항 업로드</h1>
+    <table>
+      <colgroup>
+        <col style="width: auto" />
+        <col style="width: 20%" />
+        <col style="width: 10%" />
+        <col style="width: auto" />
+      </colgroup>
+      <tbody>
         <tr>
-          <th scope="row">제목</th>
+          <th scope="row">공지사항 제목</th>
           <td>
-              <input
-                  type="text"
-                  placeholder="택배함번호 입력"
-                  ref="parcelBoxNoInput"
-                  v-model.trim="parcelBoxNo"
-                  />
-            </td>
-            </tr>
-            <tr>
-              <th scope="row">공지기간</th>
-              <td>
-              <input
-                  type="text"
-                  placeholder="보관함번호 입력"
-                  ref="mailBoxNoInput"
-                  v-model.trim="mailBoxNo"
-                  />
-                  <input
-                  type="text"
-                  placeholder="보관함번호 입력"
-                  ref="mailBoxNoInput"
-                  v-model.trim="mailBoxNo"
-                  />
-            </td>
-            </tr>   
-         
-              <td>
-              <th scope="row">월패드 알림</th>
-              <input
-                  type="text"
-                  placeholder="수신자 입력"
-                  ref="receiverInput"
-                  v-model.trim="receiver"
-                  />
-            </td>
-          <tr>
-              <td>
-              <th scope="row">만료일자</th>
-              <input
-                  type="text"
-                  placeholder="택배비 입력"
-                  ref="delFeeInput"
-                  v-model.trim="delFee"
-                  />
-            </td>
-          </tr>
-          <tr>
-            <th scope="row">UserID</th>
-            <td>{{ UserID }}</td>
-          </tr>
-          
-          <tr>
-            <th scope="row">메모</th>
-            <td>
-              <textarea
-                rows="1"
-                placeholder="미수령 OR 수령 OR 반품"
-                ref="parcelCorpTextArea"
-                v-model.trim="parcelCorp"
-              ></textarea>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-  
-      <div class="common-buttons">
-        <button
-          type="button"
-          class="w3-button w3-round w3-blue-gray"
-          v-on:click="fnSave"
-        >
-          등록</button
-        >&nbsp;
-        <button
-          type="button"
-          class="w3-button w3-round w3-gray"
-          v-on:click="fnList"
-        >
-          목록
-        </button>
-      </div>
+            <input
+              type="text"
+              placeholder="공지사항 제목을 입력하세요."
+              ref="notiTitleInput"
+              v-model.trim="notiTitle"
+            />
+          </td>
+          <th scope="row">공지사항 내용</th>
+          <td>
+            <textarea
+              type="text"
+              placeholder="공지사항 내용을 입력하세요."
+              ref="notiContentInput"
+              v-model.trim="notiContent"
+            />
+          </td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <th scope="row">공지대상</th>
+          <td>
+            <select
+              v-model="notiType"
+              ref="notiTypeInput"
+              style="width: 150px; height: 25px; text-align: center"
+            >
+              <option value="">----선택----</option>
+              <option value="Y">전체</option>
+              <option value="N">개별</option>
+            </select>
+          </td>
+          <th scope="row">공지기간</th>
+          <td style="float: center">
+            <input
+              type="date"
+              style="width: 150px; text-align: center"
+              ref="startDateInput"
+              v-model.trim="startDate"
+            />
+            ~
+            <input
+              type="date"
+              style="width: 150px; text-align: center"
+              ref="endDateInput"
+              v-model.trim="endDate"
+            />
+          </td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <label>
+            <input type="file" @change="onFileChange" />
+            Upload file
+          </label>
+        </tr>
+        <tr>
+          <th scope="row">동호</th>
+          <td style="float: center">
+            <select
+              v-model="dongCode"
+              @change="onChange($event)"
+              style="width: 100px; height: 25px; text-align: center"
+            >
+              <option value="">---선택---</option>
+              <option value="ALL">전체동</option>
+              <option
+                v-for="model in dong_items"
+                :key="model.code"
+                :value="model.code"
+              >
+                {{ model.name }}
+              </option>
+            </select>
+            동&nbsp;&nbsp;
+            <select
+              v-model="hoCode"
+              style="width: 100px; height: 25px; text-align: center"
+            >
+              <option value="">---선택---</option>
+              <option value="ALL">전체호</option>
+              <option
+                v-for="model in ho_items"
+                :key="model.code"
+                :value="model.code"
+              >
+                {{ model.name }}
+              </option>
+            </select>
+            &nbsp;&nbsp;호
+          </td>
+        </tr>
+        <tr>
+          <div>
+            <div class="text-uppercase text-bold">
+              선택한 세대의 호: {{ hoCode }}
+            </div>
+            <select class="form-control" v-model="color">
+              <option :key="i" :value="d.v" v-for="(d, i) in ho_items">
+                *개별공지 알림할 세대 선택 {{ ho_items.length }}
+              </option>
+            </select>
+            <table v-if="tableShow">
+              <tr :key="i" v-for="(d, i) in ho_items">
+                <td>
+                  <input type="checkbox" :value="d.code" v-model="hoCode" />
+                </td>
+                <td>{{ d.dongCode }} - {{ d.code }}</td>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+        </tr>
+      </tbody>
+    </table>
+    <div class="common-buttons">
+      <button
+        type="button"
+        class="w3-button w3-round w3-blue-gray"
+        v-on:click="fnSave"
+      >
+        등록</button
+      >&nbsp;
+      <button
+        type="button"
+        class="w3-button w3-round w3-gray"
+        v-on:click="fnList"
+      >
+        목록
+      </button>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      //변수생성
-      return {
-        requestBody: this.$route.query,
-        parcelStatus: "",
-        dongCode: "",
-        hoCode: "",
-        parcelCorp: "",
-        parcelBoxNo: "",
-        mailBoxNo: "",
-        receiver: "",
-        delFee: "",
-        UserID: this.$store.state.loginStore.memberId,
-      };
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    //변수생성
+    return {
+      name: "subari",
+      input: "text",
+      tableShow: true,
+      requestBody: this.$route.query,
+      parcelStatus: "",
+      dongCode: "",
+      hoCode: [],
+      parcelCorp: "",
+      parcelBoxNo: "",
+      mailBoxNo: "",
+      receiver: "",
+      delFee: "",
+      UserID: this.$store.state.loginStore.memberId,
+      file: "",
+      dong_items: [],
+      ho_items: [],
+      items: [],
+    };
+  },
+  mounted() {
+    this.fnGetDong();
+  },
+  methods: {
+    changeColor() {
+      alert(this.color);
     },
-  
-    methods: {
-      fnList() {
-        delete this.requestBody.idx;
-        this.$router.push({
-          path: "./list",
-          query: this.requestBody,
+    fnClear() {
+      this.dongCode = "";
+      this.hoCode = "";
+    },
+    fnList() {
+      delete this.requestBody.idx;
+      this.$router.push({
+        path: "./list",
+        query: this.requestBody,
+      });
+    },
+    fnGetDong() {
+      this.axios
+        .get(this.$serverUrl + "/donghoInfo/dongList")
+        .then((res) => {
+          this.dong_items = res.data.items;
+          //alert(JSON.stringify(this.items));
+        })
+        .catch((err) => {
+          console.log(err);
         });
-      },
-      fnSave() {
-        if (this.title == "") {
-          alert("수령여부 입력 필요");
-          this.$refs.parcelStatusInput.focus();
-          return;
-        } else if (this.contents == "") {
-          alert("택배 회사를 입력 하세요.");
-          this.$refs.parcelCorpTextArea.focus();
-          return;
-        }
-  
-        let apiUrl = this.$serverUrl + "/parcel/postParcel";
-        this.form = {
-          parcelStatus: this.parcelStatus,
-          dongCode: this.dongCode,
-          hoCode: this.hoCode,
-          parcelCorp: this.parcelCorp,
-          parcelBoxNo: this.parcelBoxNo,
-          mailBoxNo: this.mailBoxNo,
-          receiver: this.receiver,
-          delFee: this.delFee,
-          UserID: this.UserID,
-  
-        };
-  
-        var result = confirm("등록하시겠습니까?");
-  
-        if (result) {
-          //INSERT
-          this.axios
-            .post(apiUrl, this.form)
-            .then((res) => {
-              console.log("res.data.resultCode: " + res.data.resultCode);
-              if (res.data.resultCode == "00") {
-                //alert("글이 등록되었습니다.");
-                //alert(JSON.stringify(res.data.resultMsg));
-                this.fnList();
-              } else {
-                alert("등록되지 않았습니다.");
-              }
-            })
-            .catch((err) => {
-              if (err.message.indexOf("Network Error") > -1) {
-                alert(
-                  "네트워크가 원활하지 않습니다.\n잠시 후 다시 시도해주세요."
-                );
-              }
-            });
-        }
-      },
+      console.log("this.dongCode: " + this.dongCode);
+      console.log("this.notiType: " + this.notiType);
+      if (this.dongCode == "ALL" || this.notiType == "Y") {
+        this.tableShow = false;
+      }
     },
-  };
-  </script>
-  <style scoped></style>
-  
+
+    onChange(event) {
+      console.log("event =>" + event.target.value);
+      //alert(this.dongCode);
+      this.fnGetDongho(this.dongCode);
+      if (
+        this.dongCode == "ALL" ||
+        this.notiType == "Y" ||
+        this.hoCode == "ALL"
+      ) {
+        this.tableShow = false;
+      } else {
+        this.tableShow = true;
+      }
+    },
+    fnGetDongho(dongCode) {
+      this.axios
+        .get(this.$serverUrl + "/donghoInfo/donghoList?dongCode=" + dongCode)
+        .then((res) => {
+          this.ho_items = res.data.items;
+          //alert(JSON.stringify(this.items));
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    onFileChange(event) {
+      this.selectedFile = event.target.files[0];
+      this.onUpload();
+    },
+    onUpload() {
+      const fd = new FormData();
+      fd.append("file", this.selectedFile, this.selectedFile.name);
+      this.axios
+        .post(this.$serverUrl + "/fileUpload/file", fd)
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    fnFileUpload() {
+      this.axios
+        .post(this.$serverUrl + "/fileUpload/file", this.file)
+        .then((res) => {
+          if (!res.data.file) {
+            alert("등록되었습니다.");
+          } else {
+            alert("등록되지 않았습니다.");
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    fnSave() {
+      if (this.notiTitle == undefined) {
+        alert("공지사항 제목을 입력하세요");
+        this.$refs.parcelStatusInput.focus();
+        return;
+      } else if (this.notiContent == undefined) {
+        alert("공지사항 내용을 입력하세요");
+        this.$refs.parcelCorpTextArea.focus();
+        return;
+      } else if (this.notiType == undefined) {
+        alert("공지대상을 입력하세요");
+        this.$refs.notiTypeInput.focus();
+        return;
+      } else if (this.startDate == undefined) {
+        alert("시작일자를 입력하세요");
+        this.$refs.startDateInput.focus();
+        return;
+      } else if (this.endDate == undefined) {
+        alert("종료일자를 입력하세요");
+        this.$refs.endDateInput.focus();
+        return;
+      }
+
+      let apiUrl = this.$serverUrl + "/notice/postNotice";
+      this.form = {
+        dongCode: this.dongCode,
+        hoCode: this.hoCode,
+        notiType: this.notiType,
+        notiTitle: this.notiTitle,
+        notiContent: this.notiContent,
+        startDate: this.startDate,
+        endDate: this.endDate,
+        notiOwer: this.notiOwer,
+      };
+
+      var result = confirm("등록하시겠습니까?");
+
+      if (result) {
+        //INSERT
+        this.axios
+          .post(apiUrl, this.form)
+          .then((res) => {
+            console.log("res.data.resultCode: " + res.data.resultCode);
+            if (res.data.resultCode == "00") {
+              //alert("글이 등록되었습니다.");
+              //alert(JSON.stringify(res.data.resultMsg));
+              this.fnList();
+            } else {
+              alert("등록되지 않았습니다.");
+            }
+          })
+          .catch((err) => {
+            if (err.message.indexOf("Network Error") > -1) {
+              alert(
+                "네트워크가 원활하지 않습니다.\n잠시 후 다시 시도해주세요."
+              );
+            }
+          });
+      }
+    },
+  },
+};
+</script>
+<style scoped></style>

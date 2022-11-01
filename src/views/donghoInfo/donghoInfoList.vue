@@ -1,13 +1,6 @@
-<!-- 
-    최초 작정자: 김동현
-    최초 작성일자: 2022년10월21일
-
-    최근 수정자: 김동현
-    최근 수정일자: 2022년10월21일
--->
 <template>
   <div class="board">
-    <h2>공지사항</h2>
+    <h2>동호정보</h2>
     <div class="common-buttons">
       <button
         type="button"
@@ -21,48 +14,65 @@
       <colgroup>
         <col style="width: 15%" />
         <col style="width: *" />
-        <col style="width: *" />
-        <col style="width: 10%" />
+        <col style="width: 15%" />
+        <col style="width: 45%" />
       </colgroup>
       <tbody>
         <tr>
-          <th scope="row">조회기간</th>
+          <th scope="row">동호</th>
           <td style="float: center">
-            <input
-              type="date"
-              style="width: 150px; text-align: center"
-              v-bind:disabled="moveOutDtime == ''"
-              v-model.trim="startDate"
-            />
-            ~
-            <input
-              type="date"
-              style="width: 150px; text-align: center"
-              v-bind:disabled="moveOutDtime == ''"
-              v-model.trim="endDate"
-            />
+            <select
+              v-model="dongCode"
+              @change="onChange($event)"
+              style="width: 100px; height: 25px; text-align: center"
+            >
+              <option value="">---전체---</option>
+              <option
+                v-for="model in dong_items"
+                :key="model.code"
+                :value="model.code"
+              >
+                {{ model.name }}
+              </option>
+            </select>
+            동&nbsp;&nbsp;
+            <select
+              v-model="hoCode"
+              style="width: 100px; height: 25px; text-align: center"
+            >
+              <option value="">---전체---</option>
+              <option
+                v-for="model in ho_items"
+                :key="model.code"
+                :value="model.code"
+              >
+                {{ model.name }}
+              </option>
+            </select>
+            &nbsp;&nbsp;호
           </td>
-          <th scope="row">공지유형</th>
+          <th scope="row">면적타입</th>
           <td>
             <select
-              v-model="notiType"
+              v-model="hAreaType"
               style="width: 150px; height: 25px; text-align: center"
             >
               <option value="">----전체----</option>
-              <option value="전체">전체공지</option>
-              <option value="개별">개별공지</option>
+              <option
+                v-for="model in items"
+                :key="model.code"
+                :value="model.code"
+              >
+                {{ model.name }}
+              </option>
             </select>
           </td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
         </tr>
         <tr>
-          <th scope="row">월패드알림</th>
+          <th scope="row">알림설정</th>
           <td>
             <select
-              v-model="sendResult"
+              v-model="hnSendFlag"
               style="width: 150px; height: 25px; text-align: center"
             >
               <option value="">----전체----</option>
@@ -70,6 +80,31 @@
               <option value="N">N</option>
             </select>
           </td>
+          <th scope="row">이사처리</th>
+          <td style="float: center">
+            <input
+              type="checkbox"
+              v-model="moveOutDtime"
+              true-value="yes"
+              false-value=""
+              style="width: 30px"
+            /><!-- {{ moveOutDtime }} -->
+            <input
+              type="date"
+              style="width: 150px; text-align: center"
+              v-bind:disabled="moveOutDtime == ''"
+              v-model.trim="moveOutDtimeStart"
+            />
+            ~
+            <input
+              type="date"
+              style="width: 150px; text-align: center"
+              v-bind:disabled="moveOutDtime == ''"
+              v-model.trim="moveOutDtimeEnd"
+            />
+          </td>
+        </tr>
+        <tr>
           <th scope="row">검색단위</th>
           <td>
             <input
@@ -80,8 +115,6 @@
               @keyup.enter="fnSearch"
             />
           </td>
-          <td></td>
-          <td></td>
           <td></td>
           <td></td>
         </tr>
@@ -97,41 +130,37 @@
   <table class="w3-table-all">
     <colgroup>
       <col style="width: 10%" />
-      <col style="width: 10%" />
-      <col style="width: 10%" />
+      <col style="width: 15%" />
+      <col style="width: 15%" />
+      <col style="width: 15%" />
+      <col style="width: 15%" />
+      <col style="width: 15%" />
       <col style="width: *" />
     </colgroup>
     <thead>
       <tr>
         <th>No</th>
-        <th>공지유형</th>
-        <th>공지제목</th>
-        <th>작성자</th>
-        <th>게시일자</th>
-        <th>만료일자</th>
-        <th>알림</th>
-        <th>수정보기</th>
+        <th>동</th>
+        <th>호</th>
+        <th>라인</th>
+        <th>면적타입</th>
+        <th>이사일자</th>
+        <th>세대알림</th>
       </tr>
     </thead>
     <tbody>
-      <tr class="hi" v-for="(row, i) in list" :key="i">
-        <a v-on:click="fnView(`${row.idx}`)">{{ row.No }}</a>
-        <td>{{ row.notiType }}</td>
-        <td>{{ row.notiTitle }}</td>
-        <td>{{ row.notiOwner }}</td>
-        <td>{{ row.startDate }}</td>
-        <td>{{ row.endDate }}</td>
-        <td>{{ row.sendResult }}</td>
-        <td>
-          <div class="table-button-container">
-            <button
-              class="w3-button w3-round w3-green"
-              v-on:click="fnView(`${row.idx}`)"
-            >
-              <i class="fa fa-remove"></i>상세</button
-            >&nbsp;&nbsp;
-          </div>
-        </td>
+      <tr
+        v-for="(row, i) in list"
+        :key="i"
+        v-on:click="fnView(`${row.dongCode}`, `${row.hoCode}`)"
+      >
+        <td>{{ i + 1 }}</td>
+        <td>{{ row.dongCode }}</td>
+        <td>{{ row.hoCode }}</td>
+        <td>{{ row.lineCode }}</td>
+        <td>{{ row.hAreaType }}</td>
+        <td>{{ row.moveOutDtime }}</td>
+        <td>{{ row.hnSendFlag }}</td>
       </tr>
     </tbody>
   </table>
@@ -193,8 +222,6 @@ export default {
   data() {
     //변수생성
     return {
-      selected: [],
-      selectAll: false,
       requestBody: {}, //리스트 페이지 데이터전송
       list: {}, //리스트 데이터
       no: "", //게시판 숫자처리
@@ -208,12 +235,18 @@ export default {
       }, //페이징 데이터
       page: this.$route.query.page ? this.$route.query.page : 1,
       size: this.$route.query.size ? this.$route.query.size : 10,
-      startDate: this.$route.query.startDate,
-      endDate: this.$route.query.endDate,
-      notiType: this.$route.query.notiType,
-      notiContent: this.$route.query.notiContent,
-      sendResult: this.$route.query.sendResult,
-
+      dongCode: this.$route.query.dongCode,
+      hoCode: this.$route.query.hoCode,
+      hAreaType: this.$route.query.hAreaType,
+      hnSendFlag: this.$route.query.hnSendFlag,
+      moveOutDtime: this.$route.query.moveOutDtime
+        ? this.$route.query.moveOutDtime
+        : "",
+      moveOutDtimeStart: this.$route.query.moveOutDtimeStart,
+      moveOutDtimeEnd: this.$route.query.moveOutDtimeEnd,
+      dong_itmes: [],
+      ho_items: [],
+      items: [],
       paginavigation: function () {
         //페이징 처리 for문 커스텀
         let pageNumber = []; //;
@@ -225,39 +258,39 @@ export default {
         for (let i = start_page; i <= end_page; i++) {
           pageNumber.push(i);
         }
+        //console.log("pageNumber.length: %d", pageNumber.length);
         return pageNumber;
       },
     };
   },
   mounted() {
+    this.fnGetDong();
+    this.fnGethArea();
     this.fnGetList();
   },
   methods: {
-    select() {
-      this.selected = [];
-      if (!this.selectAll) {
-        for (let i in this.list) {
-          this.selected.push(this.list[i].idx);
-        }
-      }
-    },
     fnGetList() {
       this.requestBody = {
         // 데이터 전송
         page: this.page,
         size: this.size,
-        startDate: this.startDate,
-        endDate: this.endDate,
-        notiType: this.notiType,
-        notiContent: this.notiContent,
-        sendResult: this.sendResult,
+        dongCode: this.dongCode,
+        hoCode: this.hoCode,
+        hAreaType: this.hAreaType,
+        hnSendFlag: this.hnSendFlag,
+        moveOutDtime: this.moveOutDtime,
+        moveOutDtimeStart: this.moveOutDtimeStart,
+        moveOutDtimeEnd: this.moveOutDtimeEnd,
       };
+
       this.axios
-        .get(this.$serverUrl + "/notice/getNoticeList", {
+        .get(this.$serverUrl + "/donghoInfo/list", {
           params: this.requestBody,
           headers: {},
         })
         .then((res) => {
+          //this.list = res.data; //서버에서 데이터를 목록으로 보내므로 바로 할당하여 사용할 수 있다.
+          //alert(res.data.resultCode);
           if (res.data.resultCode == "00") {
             this.list = res.data.list;
             this.paging = res.data.paging;
@@ -275,6 +308,57 @@ export default {
             alert(err.message);
           }
         });
+    },
+    fnGetDong() {
+      this.axios
+        .get(this.$serverUrl + "/donghoInfo/dongList")
+        .then((res) => {
+          this.dong_items = res.data.items;
+          //alert(JSON.stringify(this.items));
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    onChange(event) {
+      console.log("event =>" + event.target.value);
+      //alert(this.dongCode);
+      this.fnGetDongho(this.dongCode);
+    },
+    fnGetDongho(dongCode) {
+      this.axios
+        .get(this.$serverUrl + "/donghoInfo/donghoList?dongCode=" + dongCode)
+        .then((res) => {
+          this.ho_items = res.data.items;
+          //alert(JSON.stringify(this.items));
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    fnGethArea() {
+      this.axios
+        .get(this.$serverUrl + "/donghoInfo/hAreaList")
+        .then((res) => {
+          this.items = res.data.items;
+          //alert(JSON.stringify(this.items));
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    fnView(dongCode, hoCode) {
+      this.requestBody.dongCode = dongCode;
+      this.requestBody.hoCode = hoCode;
+      this.$router.push({
+        path: "./update",
+        query: this.requestBody,
+      });
+    },
+    fnWrite() {
+      this.$router.push({
+        path: "./insert",
+      });
     },
     fnSearch() {
       //검색
@@ -301,63 +385,16 @@ export default {
     fnList() {
       this.page = 1;
       this.size = 10;
-      this.startDate = "";
-      this.endDate = "";
-      this.notiType = "";
-      this.sendResult = "";
+      this.hAreaType = "";
+      this.hnSendFlag = "";
+      this.moveOutDtime = "";
+      this.moveOutDtimeStart = "";
+      this.moveOutDtimeEnd = "";
+
       this.fnGetList();
-    },
-    fnView(idx) {
-      this.requestBody.idx = idx;
-      this.$router.push({
-        path: "./detail",
-        query: this.requestBody,
-      });
-    },
-    fnWrite() {
-      this.$router.push({
-        path: "./insert",
-      });
-    },
-    fnDelete() {
-      var result = confirm("삭제하시겠습니까?");
-      console.log("this.selected.length: " + this.selected.length);
-      // let selectedItems = this.selected.length;
-      for (let i = 0; i < this.selected.length; ++i) {
-        // this.selected.push(this.list[i].idx);
-        if (result) {
-          this.axios
-            .delete(
-              this.$serverUrl + "/notice/deleteNotice/" + this.list[i].idx,
-              {}
-            )
-            .then((res) => {
-              console.log("res.data.resultCode: " + res.data.resultCode);
-              if (res.data.resultCode == "00") {
-                alert("삭제되었습니다.");
-                //alert(JSON.stringify(res.data.resultMsg));
-                this.fnList();
-              } else {
-                alert(
-                  `월패드알림 Y 이므로 삭제 불가: ${this.list[i].notiTitle}`
-                );
-              }
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        }
-      }
     },
   },
 };
 </script>
 
-<style scoped>
-.hi:hover {
-  background-color: yellow;
-}
-body {
-  padding: 50px;
-}
-</style>
+<style scoped></style>

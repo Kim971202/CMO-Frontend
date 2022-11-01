@@ -1,58 +1,86 @@
 <template>
   <div class="board">
-    <h2>민원관리</h2>
-    <div class="common-buttons"></div>
+    <h2>관리비</h2>
+    <div class="common-buttons">
+      <button
+        type="button"
+        class="w3-button w3-round w3-teal"
+        v-on:click="fnWrite"
+      >
+        신규
+      </button>
+    </div>
     <table>
       <colgroup>
         <col style="width: 15%" />
-        <col style="width: 15%" />
-        <col style="width: 15%" />
         <col style="width: *" />
-        <col style="width: *" />
+        <col style="width: 15%" />
+        <col style="width: 45%" />
       </colgroup>
-
       <tbody>
         <tr>
-          <th scope="row">시작일자</th>
-          <td>
-            <input type="text" ref="titleInput" v-model.trim="startDate" />
+          <th scope="row">동호</th>
+          <td style="float: center">
+            <select
+              v-model="dongCode"
+              @change="onChange($event)"
+              style="width: 100px; height: 25px; text-align: center"
+            >
+              <option value="">---전체---</option>
+              <option
+                v-for="model in dong_items"
+                :key="model.code"
+                :value="model.code"
+              >
+                {{ model.name }}
+              </option>
+            </select>
+            동&nbsp;&nbsp;
+            <select
+              v-model="hoCode"
+              style="width: 100px; height: 25px; text-align: center"
+            >
+              <option value="">---전체---</option>
+              <option
+                v-for="model in ho_items"
+                :key="model.code"
+                :value="model.code"
+              >
+                {{ model.name }}
+              </option>
+            </select>
+            &nbsp;&nbsp;호
           </td>
-          <th scope="row">종료일자</th>
+          <th scope="row">면적타입</th>
           <td>
-            <input type="text" ref="authorInput" v-model.trim="endDate" />
-          </td>
-          <th scope="row">동 / 호</th>
-          <td>
-            <input
-              type="text"
-              ref="authorInput"
-              v-model.trim="dongCode"
-              placeholder="동"
-            />
-            <input
-              type="text"
-              ref="authorInput"
-              v-model.trim="hoCode"
-              placeholder="호"
-            />
-          </td>
-          <th scope="row">신청일자</th>
-          <td>
-            <input type="text" ref="titleInput" v-model.trim="appReceiptDate" />
+            <select
+              v-model="hAreaType"
+              style="width: 150px; height: 25px; text-align: center"
+            >
+              <option value="">----전체----</option>
+              <option
+                v-for="model in items"
+                :key="model.code"
+                :value="model.code"
+              >
+                {{ model.name }}
+              </option>
+            </select>
           </td>
         </tr>
-      </tbody>
-      <tbody>
         <tr>
           <th scope="row">검색단위</th>
-          <td colspan="2">
+          <td>
             <input
               type="text"
+              style="width: 150px; text-align: center"
               ref="sizeInput"
               v-model="size"
               @keyup.enter="fnSearch"
             />
           </td>
+          <td></td>
+          <td></td>
         </tr>
       </tbody>
     </table>
@@ -61,10 +89,8 @@
     <div class="right">
       <button class="button blue" @click="fnSearch">검색</button>
       <button class="button" @click="fnList">취소</button>
-      <button type="button" @click="fnDelete">삭제</button>
     </div>
   </div>
-  <div class="text-uppercase text-bold">id selected: {{ selected }}</div>
   <table class="w3-table-all">
     <colgroup>
       <col style="width: 10%" />
@@ -77,34 +103,36 @@
     </colgroup>
     <thead>
       <tr>
-        <label class="form-checkbox">
-          <input type="checkbox" v-model="selectAll" @click="select" />
-          <i class="form-icon"></i>
-        </label>
         <th>No</th>
-        <th>신청일자</th>
-        <th>신청자</th>
-        <th>신청방법</th>
-        <th>접수일자</th>
-        <th>처리일자</th>
-        <th>상태</th>
+        <th>동</th>
+        <th>호</th>
+        <th>평형</th>
+        <th>부과월</th>
+        <th>합계</th>
+        <th>상세보기</th>
       </tr>
     </thead>
     <tbody>
       <tr class="hi" v-for="(row, i) in list" :key="i">
+        <td>{{ row.no }}</td>
+        <td>{{ row.dongCode }}</td>
+        <td>{{ row.hoCode }}</td>
+        <td>{{ row.hAreaType }}</td>
+        <td>{{ row.payMonth }}</td>
+        <td>{{ "￦" + row.totalMng }}</td>
         <td>
-          <label class="form-checkbox">
-            <input type="checkbox" :value="row.idx" v-model="selected" />
-            <i class="form-icon"></i>
-          </label>
+          <div class="table-button-container">
+            <button
+              class="w3-button w3-round w3-green"
+              v-on:click="fnView(`${row.dongCode}`, 
+                                 `${row.hoCode}`,
+                                 `${row.mngYear}`,
+                                 `${row.mngMonth}`)"
+            >
+              <i class="fa fa-remove"></i>상세</button
+            >&nbsp;&nbsp;
+          </div>
         </td>
-        <td>{{ row.No }}</td>
-        <td>{{ row.appReceiptDate }}</td>
-        <td>{{ row.applicant }}</td>
-        <td>{{ row.appMethod }}</td>
-        <td>{{ row.appReceiptDate }}</td>
-        <td>{{ row.appCompleteDate }}</td>
-        <td>{{ row.progressStatus }}</td>
       </tr>
     </tbody>
   </table>
@@ -181,12 +209,12 @@ export default {
       }, //페이징 데이터
       page: this.$route.query.page ? this.$route.query.page : 1,
       size: this.$route.query.size ? this.$route.query.size : 10,
-      startDate: this.$route.query.startDate,
-      endDate: this.$route.query.endDate,
       dongCode: this.$route.query.dongCode,
       hoCode: this.$route.query.hoCode,
-      appReceiptDate: this.$route.query.appReceiptDate,
-
+      hAreaType: this.$route.query.hAreaType,
+      dong_itmes: [],
+      ho_items: [],
+      items: [],
       paginavigation: function () {
         //페이징 처리 for문 커스텀
         let pageNumber = []; //;
@@ -204,33 +232,65 @@ export default {
   },
   mounted() {
     this.fnGetList();
+    this.fnGetDong();
+    this.fnGethArea();
   },
   methods: {
-    select() {
-      this.selected = [];
-      if (!this.selectAll) {
-        for (let i in this.list) {
-          this.selected.push(this.list[i].idx);
-        }
-      }
+    fnGetDong() {
+      this.axios
+        .get(this.$serverUrl + "/donghoInfo/dongList")
+        .then((res) => {
+          this.dong_items = res.data.items;
+          //alert(JSON.stringify(this.items));
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    onChange(event) {
+      console.log("event =>" + event.target.value);
+      this.fnGetDongho(this.dongCode);
+    },
+    fnGetDongho(dongCode) {
+      this.axios
+        .get(this.$serverUrl + "/donghoInfo/donghoList?dongCode=" 
+        + dongCode) 
+        .then((res) => {
+          this.ho_items = res.data.items;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    fnGethArea() {
+      this.axios
+        .get(this.$serverUrl + "/donghoInfo/hAreaList")
+        .then((res) => {
+          this.items = res.data.items;
+          //alert(JSON.stringify(this.items));
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
     fnGetList() {
       this.requestBody = {
         // 데이터 전송
         page: this.page,
         size: this.size,
-        startDate: this.startDate,
-        endDate: this.endDate,
         dongCode: this.dongCode,
         hoCode: this.hoCode,
-        appReceiptDate: this.appReceiptDate,
+        hAreaType: this.hAreaType,
       };
+
       this.axios
-        .get(this.$serverUrl + "/complaint/getApplicationList", {
+        .get(this.$serverUrl + "/mngFee/getMngFeeList", {
           params: this.requestBody,
           headers: {},
         })
         .then((res) => {
+          //this.list = res.data; //서버에서 데이터를 목록으로 보내므로 바로 할당하여 사용할 수 있다.
+          //alert(res.data.resultCode);
           if (res.data.resultCode == "00") {
             this.list = res.data.list;
             this.paging = res.data.paging;
@@ -248,6 +308,21 @@ export default {
             alert(err.message);
           }
         });
+    },
+    fnView(dongCode, hoCode, mngYear, mngMonth) {
+      this.requestBody.dongCode = dongCode;
+      this.requestBody.hoCode = hoCode;
+      this.requestBody.mngYear = mngYear;
+      this.requestBody.mngMonth = mngMonth;
+      this.$router.push({
+        path: "./detail",
+        query: this.requestBody,
+      });
+    },
+    fnWrite() {
+      this.$router.push({
+        path: "./insert",
+      });
     },
     fnSearch() {
       //검색
@@ -274,46 +349,11 @@ export default {
     fnList() {
       this.page = 1;
       this.size = 10;
-      this.fnGetList();
-    },
-    fnView(idx) {
-      this.requestBody.idx = idx;
-      this.$router.push({
-        path: "./detail",
-        query: this.requestBody,
-      });
-    },
+      this.startDate = "";
+      this.dongCode = "";
+      this.hoCode = "";
 
-    //TODO: 삭제후 페이지 refresh 필요
-    fnDelete() {
-      var result = confirm("삭제하시겠습니까?");
-      console.log("this.selected.length: " + this.selected.length);
-      // let selectedItems = this.selected.length;
-      for (let i = 0; i < this.selected.length; ++i) {
-        // this.selected.push(this.list[i].idx);
-        if (result) {
-          this.axios
-            .delete(
-              this.$serverUrl +
-                "/complaint/deleteApplication/" +
-                this.list[i].idx,
-              {}
-            )
-            .then((res) => {
-              console.log("res.data.resultCode: " + res.data.resultCode);
-              if (res.data.resultCode == "00") {
-                alert("삭제되었습니다.");
-                //alert(JSON.stringify(res.data.resultMsg));
-                this.fnList();
-              } else {
-                alert("삭제되지 않았습니다.");
-              }
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        }
-      }
+      this.fnGetList();
     },
   },
 };

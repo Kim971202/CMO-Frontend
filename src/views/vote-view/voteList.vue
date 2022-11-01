@@ -1,15 +1,7 @@
 <template>
   <div class="board">
     <h2>주민투표</h2>
-    <div class="common-buttons">
-      <button
-        type="button"
-        class="w3-button w3-round w3-teal"
-        v-on:click="fnWrite"
-      >
-        신규
-      </button>
-    </div>
+    <div class="common-buttons"></div>
     <table>
       <colgroup>
         <col style="width: 15%" />
@@ -54,8 +46,10 @@
     <div class="right">
       <button class="button blue" @click="fnSearch">검색</button>
       <button class="button" @click="fnList">취소</button>
+      <button class="button" @click="fnWrite">신규</button>
     </div>
   </div>
+  <div class="text-uppercase text-bold">id selected: {{ selected }}</div>
   <table class="w3-table-all">
     <colgroup>
       <col style="width: 10%" />
@@ -65,6 +59,10 @@
     </colgroup>
     <thead>
       <tr>
+        <label class="form-checkbox">
+          <input type="checkbox" v-model="selectAll" @click="select" />
+          <i class="form-icon"></i>
+        </label>
         <th>No</th>
         <th>투표제목</th>
         <th>투표시작일시</th>
@@ -72,19 +70,34 @@
         <th>투표율(%)</th>
         <th>개표여부</th>
         <th>작성자</th>
+        <th>수정보기</th>
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(row, i) in list" :key="i">
+      <tr class="hi" v-for="(row, i) in list" :key="i">
         <td>
-          <a v-on:click="fnView(`${row.idx}`)">{{ row.no }}</a>
+          <label class="form-checkbox">
+            <input type="checkbox" :value="row.idx" v-model="selected" />
+            <i class="form-icon"></i>
+          </label>
         </td>
+        <td>{{ row.no }}</td>
         <td>{{ row.voteTitle }}</td>
         <td>{{ row.vStartDTime }}</td>
         <td>{{ row.vEndDTime }}</td>
         <td>{{ row.voteRate + "%" }}</td>
         <td>{{ row.vEndFlag }}</td>
         <td>{{ row.userCode }}</td>
+        <td>
+          <div class="table-button-container">
+            <button
+              class="w3-button w3-round w3-green"
+              v-on:click="fnView(`${row.idx}`)"
+            >
+              <i class="fa fa-remove"></i>상세</button
+            >&nbsp;&nbsp;
+          </div>
+        </td>
       </tr>
     </tbody>
   </table>
@@ -146,6 +159,8 @@ export default {
   data() {
     //변수생성
     return {
+      selected: [],
+      selectAll: false,
       requestBody: {}, //리스트 페이지 데이터전송
       list: {}, //리스트 데이터
       no: "", //게시판 숫자처리
@@ -183,6 +198,14 @@ export default {
     this.fnGetList();
   },
   methods: {
+    select() {
+      this.selected = [];
+      if (!this.selectAll) {
+        for (let i in this.list) {
+          this.selected.push(this.list[i].idx);
+        }
+      }
+    },
     fnGetList() {
       this.requestBody = {
         // 데이터 전송
@@ -266,4 +289,11 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.hi:hover {
+  background-color: yellow;
+}
+body {
+  padding: 50px;
+}
+</style>
