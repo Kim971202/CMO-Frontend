@@ -28,24 +28,6 @@
               >
             </li>
             <li class="nav-item">
-              <router-link to="/elv/list" class="nav-link"
-                >엘리베이터</router-link
-              >
-            </li>
-            <li class="nav-item">
-              <router-link to="/parcel/list" class="nav-link">택배</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link to="/elecCar/list" class="nav-link"
-                >전기차 충전 이력</router-link
-              >
-            </li>
-            <li class="nav-item">
-              <router-link to="/complaint/list" class="nav-link"
-                >민원관리</router-link
-              >
-            </li>
-            <li class="nav-item">
               <router-link to="/ems/list" class="nav-link">EMS</router-link>
             </li>
             <li class="nav-item">

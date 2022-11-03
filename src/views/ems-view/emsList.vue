@@ -75,7 +75,7 @@
               <option
                 v-for="model in ems_items"
                 :key="model.energyType"
-                :value="model.energyType"
+                :value="model.engEnergyType"
               >
                 {{ model.energyType }}
               </option>
@@ -160,7 +160,7 @@
             <th>사용</th>
           </tr>
         </th>
-        <th>수정보기</th>
+        <th>상세보기</th>
       </tr>
     </thead>
     <tbody>

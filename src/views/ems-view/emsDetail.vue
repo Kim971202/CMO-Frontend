@@ -279,6 +279,11 @@ export default {
       }
     },
     fnList() {
+      delete this.requestBody.startDate;
+      delete this.requestBody.endDate;
+      delete this.requestBody.dongCode;
+      delete this.requestBody.hoCode;
+      delete this.requestBody.energyType;
       this.$router.push({
         path: "./list",
         query: this.requestBody,
@@ -290,33 +295,6 @@ export default {
         path: "./detail",
         query: this.requestBody,
       });
-    },
-
-    //TODO: 삭제후 페이지 refresh 필요
-    fnDelete() {
-      var result = confirm("삭제하시겠습니까?");
-      console.log("this.selected.length: " + this.selected.length);
-        if (result) {
-          this.axios
-            .delete(
-              this.$serverUrl +
-                "/vote/deleteApplication/" +
-                this.idx,
-              {}
-            )
-            .then((res) => {
-              console.log("res.data.resultCode: " + res.data.resultCode);
-              if (res.data.resultCode == "00") {
-                alert("삭제되었습니다.");
-                this.fnList();
-              } else {
-                alert("삭제되지 않았습니다.");
-              }
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        }
     },
   },
 };

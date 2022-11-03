@@ -3,8 +3,7 @@
     <h2>공지사항</h2>
     <table>
       <colgroup>
-        <col style="width: 18.5%" />
-        <col style="width: " />
+        <col style="width: 15%" />
       </colgroup>
       <tbody>
         <tr>
@@ -17,20 +16,47 @@
         <tr>
           <th scope="row">게시일자</th>
           <td>{{ startDate.replace("T", " ") }}</td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
           <th scope="row">만료일자</th>
           <td>{{ endDate.replace("T", " ") }}</td>
+          <td></td>
+          <td></td>
           <td></td>
         </tr>
         <tr>
           <th scope="row">월패드알림</th>
           <td>{{ sendResult }}</td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
           <th scope="row">공지대상</th>
           <td>{{ notiType }}</td>
+          <td></td>
+          <td></td>
           <td></td>
         </tr>
         <tr>
           <th scope="row">첨부파일</th>
-          <input type="file" />
+          <td>
+            {{ fileName }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button
+              type="button"
+              class="w3-button w3-round w3-blue-gray"
+              @click="fnDownloadFile"
+            >
+              다운로드</button
+            >&nbsp;
+          </td>
+
+          <td></td>
+          <td></td>
+          <td></td>
         </tr>
         <tr>
           <th scope="row">공지 내용</th>
@@ -121,6 +147,23 @@ export default {
         path: "./update",
         query: this.requestBody,
       });
+    },
+    fnDownloadFile() {
+      const FileDownload = require("js-file-download");
+      this.axios
+        .get(
+          this.$serverUrl + "/fileUpload/download?fileName=" + this.fileName,
+          { responseType: "blob" }
+        )
+        .then((res) => {
+          alert("성공적으로 다운로드 하였습니다.");
+          FileDownload(res.data, this.fileName);
+          console.log(res);
+        })
+        .catch((err) => {
+          alert("현제 접속자가 많아 잠시후에 시도하십시오");
+          console.log(err);
+        });
     },
     fnDelete() {
       var result = confirm("삭제하시겠습니까?");

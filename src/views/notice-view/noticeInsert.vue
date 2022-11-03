@@ -1,4 +1,5 @@
 <template>
+  <meta charset="UTF-8" />
   <div class="board">
     <h1>공지사항 업로드</h1>
     <table>
@@ -64,10 +65,12 @@
           <td></td>
         </tr>
         <tr>
-          <label>
-            <input type="file" @change="onFileChange" />
-            Upload file
-          </label>
+          <input
+            type="file"
+            @change="onFileChange"
+            charset="UTF-8"
+            id="images"
+          />
         </tr>
         <tr>
           <th scope="row">동호</th>
@@ -78,7 +81,11 @@
               style="width: 100px; height: 25px; text-align: center"
             >
               <option value="">---선택---</option>
-              <option value="ALL">전체동</option>
+              <option value="ALL" :disabled="validated == 1">전체동</option>
+              <button @click="disabled = (disabled + 1) % 2">
+                Toggle Enable
+              </button>
+              <input type="text" :disabled="disabled == 1" />
               <option
                 v-for="model in dong_items"
                 :key="model.code"
@@ -102,7 +109,7 @@
                 {{ model.name }}
               </option>
             </select>
-            &nbsp;&nbsp;호
+            호&nbsp;&nbsp;
           </td>
         </tr>
         <tr>
@@ -169,6 +176,7 @@ export default {
       dong_items: [],
       ho_items: [],
       items: [],
+      disabled: 1,
     };
   },
   mounted() {
@@ -199,17 +207,15 @@ export default {
         .catch((err) => {
           console.log(err);
         });
-      console.log("this.dongCode: " + this.dongCode);
-      console.log("this.notiType: " + this.notiType);
-      if (this.dongCode == "ALL" || this.notiType == "Y") {
-        this.tableShow = false;
-      }
     },
 
     onChange(event) {
       console.log("event =>" + event.target.value);
       //alert(this.dongCode);
       this.fnGetDongho(this.dongCode);
+      if (this.notiType == "Y") {
+        this.dongCode = "ALL";
+      }
       if (
         this.dongCode == "ALL" ||
         this.notiType == "Y" ||
@@ -233,13 +239,17 @@ export default {
     },
     onFileChange(event) {
       this.selectedFile = event.target.files[0];
-      this.onUpload();
+      if (this.selectedFile != null) {
+        this.onUpload();
+      }
     },
     onUpload() {
       const fd = new FormData();
       fd.append("file", this.selectedFile, this.selectedFile.name);
       this.axios
-        .post(this.$serverUrl + "/fileUpload/file", fd)
+        .post(this.$serverUrl + "/fileUpload/file", fd, {
+          responseType: "blob",
+        })
         .then((res) => {
           console.log(res);
         })
@@ -324,4 +334,29 @@ export default {
   },
 };
 </script>
-<style scoped></style>
+<style scoped>
+input[type="file"] {
+  width: 350px;
+  max-width: 100%;
+  color: #444;
+  padding: 5px;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #555;
+}
+
+input[type="file"]::file-selector-button {
+  margin-right: 20px;
+  border: none;
+  background: #084cdf;
+  padding: 10px 20px;
+  border-radius: 10px;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background: #0d45a5;
+}
+</style>
