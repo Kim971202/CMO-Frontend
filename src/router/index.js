@@ -186,6 +186,24 @@ const routes = [
     meta: { requireLogin: true },
   },
   {
+    path: "/vote/update",
+    name: "voteUpdate",
+    component: () => import("../views/vote-view/voteUpdate.vue"),
+    meta: { requireLogin: true },
+  },
+  {
+    path: "/vote/voteEnd",
+    name: "voteVoteEnd",
+    component: () => import("../views/vote-view/voteEnd.vue"),
+    meta: { requireLogin: true },
+  },
+  {
+    path: "/vote/voteFn",
+    name: "voteVoteFn",
+    component: () => import("../views/vote-view/voteFinish.vue"),
+    meta: { requireLogin: true },
+  },
+  {
     path: "/mngFee/list",
     name: "mngFeeList",
     component: () => import("../views/mngFee-view/mngFeeList.vue"),

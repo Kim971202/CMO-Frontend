@@ -1,6 +1,6 @@
 <template>
   <div class="board">
-    <h2>주민투표 상세보기</h2>
+    <h2>주민투표 수정</h2>
     <table>
       <colgroup>
         <col style="width: 18.5%" />
@@ -26,8 +26,8 @@
               <td>
                 <input type="checkbox" value="all" v-model="allSelected" />
               </td>
-              <td>{{ item.itemNo }}</td>
-              <td>{{ item.itemContent }}</td>
+              <td><input type="text" v-model="item.itemNo" /></td>
+              <td><input type="text" v-model="item.itemContent" /></td>
             </tr>
           </table>
         </tr>

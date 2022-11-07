@@ -1,30 +1,24 @@
 <template>
   <div class="board">
-    <h2>주민투표 상세보기</h2>
+    <h2>주민투표 마감 / 오프라인 투표함 개표결과</h2>
     <table>
       <colgroup>
-        <col style="width: 18.5%" />
-        <col style="width: " />
+        <col style="width: 10%" />
+        <col style="width: 70%" />
+        <col style="width: 50%" />
       </colgroup>
       <tbody>
         <tr>
-          <th scope="row">투표제목</th>
-          <td class="title">{{ voteTitle }}</td>
-        </tr>
-        <tr>
-          <th scope="row">시작일시</th>
-          <td>{{ vStartDTime }}</td>
-        </tr>
-        <tr>
-          <th scope="row">마감일시</th>
-          <td>{{ vEndDTime }}</td>
-        </tr>
-        <tr>
           <th scope="row">항목</th>
           <table>
-            <tr v-for="(item, index) in voteItems" v-bind:key="index">
+            <tr v-for="(item, index) in voteItems" :key="index">
               <td>
-                <input type="checkbox" value="all" v-model="allSelected" />
+                <input
+                  v-model="voteNumberOff[index]"
+                  type="number"
+                  min="0"
+                  :key="index"
+                />
               </td>
               <td>{{ item.itemNo }}</td>
               <td>{{ item.itemContent }}</td>
@@ -37,39 +31,17 @@
     <div class="common-buttons">
       <button
         type="button"
-        class="w3-button w3-round w3-blue-gray"
-        v-on:click="fnUpdate"
-      >
-        수정</button
-      >&nbsp;
-      <button
-        type="button"
-        class="w3-button w3-round w3-red"
-        v-on:click="fnDelete"
-      >
-        삭제</button
-      >&nbsp;
-      <button
-        type="button"
         class="w3-button w3-round w3-blue"
         v-on:click="fnVoteEnd"
       >
-        투표마감</button
-      >&nbsp;
-      <button
-        type="button"
-        class="w3-button w3-round w3-green"
-        v-on:click="fnvoteResult"
-      >
-        결과보기
-      </button>
-      &nbsp;
+        투표마감하기</button
+      >&nbsp; &nbsp;
       <button
         type="button"
         class="w3-button w3-round w3-black"
         v-on:click="fnList"
       >
-        종료</button
+        취소</button
       >&nbsp;
     </div>
   </div>
@@ -86,6 +58,7 @@ export default {
       vStartDTime: "",
       vEndDTime: "",
       voteItems: [],
+      voteNumberOff: [],
     };
   },
   mounted() {
@@ -102,7 +75,6 @@ export default {
           this.vStartDTime = res.data.vStartDTime;
           this.vEndDTime = res.data.vEndDTime;
           this.voteItems = res.data.voteItems;
-          this.voteEndFlag = res.data.voteEndFlag;
         })
         .catch((err) => {
           if (err.message.indexOf("Network Error") > -1) {
@@ -110,34 +82,45 @@ export default {
           }
         });
     },
-    fnvoteResult() {
-      if (this.voteEndFlag == "N") {
-        alert("종료되지 않은 투표입니다.");
-      } else {
-        this.$router.push({
-          path: "./voteFn",
-          query: this.requestBody,
-        });
-      }
-    },
     fnVoteEnd() {
-      if (this.voteEndFlag == "Y") {
-        alert("이미 종료된 투표 입니다.");
-      } else {
-        this.$router.push({
-          path: "./voteEnd",
-          query: this.requestBody,
-        });
+      let apiUrl = this.$serverUrl + "/vote/postOffVote";
+      this.form = {
+        idx: this.idx,
+        voteNumberOff: this.voteNumberOff,
+        voteItems: this.voteItems,
+      };
+      var result = confirm("마감하시겠습니까?");
+      if (result) {
+        console.log(this.form);
+        this.axios
+          .post(apiUrl, this.form)
+          .then((res) => {
+            console.log("res.data.resultCode: " + res.data.resultCode);
+            if (res.data.resultCode == "00") {
+              //   this.fnList();
+            } else {
+              alert("마김처리 되지 않았습니다.");
+            }
+          })
+          .catch((err) => {
+            if (err.message.indexOf("Network Error") > -1) {
+              alert(
+                "네트워크가 원활하지 않습니다.\n잠시 후 다시 시도해주세요."
+              );
+            }
+          });
       }
-    },
-    fnList() {
-      delete this.requestBody.idx;
       this.$router.push({
-        path: "./list",
+        path: "./voteFn",
         query: this.requestBody,
       });
     },
-
+    fnList() {
+      this.$router.push({
+        path: "./detail",
+        query: this.requestBody,
+      });
+    },
     fnUpdate() {
       this.$router.push({
         path: "./update",
