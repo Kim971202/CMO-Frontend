@@ -1,6 +1,6 @@
 <template>
   <div class="board">
-    <h2>공지사항</h2>
+    <h2>공지사항 상세보기</h2>
     <table>
       <colgroup>
         <col style="width: 15%" />

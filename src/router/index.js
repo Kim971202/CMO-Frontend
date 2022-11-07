@@ -162,6 +162,12 @@ const routes = [
     meta: { requireLogin: true },
   },
   {
+    path: "/notice/update",
+    name: "noticeUpdate",
+    component: () => import("../views/notice-view/noticeUpdate.vue"),
+    meta: { requireLogin: true },
+  },
+  {
     path: "/vote/list",
     name: "voteList",
     component: () => import("../views/vote-view/voteList.vue"),
@@ -171,6 +177,12 @@ const routes = [
     path: "/vote/detail",
     name: "voteDetail",
     component: () => import("../views/vote-view/voteDetail.vue"),
+    meta: { requireLogin: true },
+  },
+  {
+    path: "/vote/insert",
+    name: "voteInsert",
+    component: () => import("../views/vote-view/voteInsert.vue"),
     meta: { requireLogin: true },
   },
   {
