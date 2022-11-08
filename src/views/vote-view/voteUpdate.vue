@@ -13,21 +13,18 @@
         </tr>
         <tr>
           <th scope="row">시작일시</th>
-          <td>{{ vStartDTime }}</td>
+          <td>{{ startDate }}</td>
         </tr>
         <tr>
           <th scope="row">마감일시</th>
-          <td>{{ vEndDTime }}</td>
+          <td>{{ endDate }}</td>
         </tr>
         <tr>
           <th scope="row">항목</th>
           <table>
-            <tr v-for="(item, index) in voteItems" v-bind:key="index">
-              <td>
-                <input type="checkbox" value="all" v-model="allSelected" />
-              </td>
-              <td><input type="text" v-model="item.itemNo" /></td>
-              <td><input type="text" v-model="item.itemContent" /></td>
+            <tr v-for="(item, index) in itemContents" v-bind:key="index">
+              <button @click="deleteItem(index)">X</button>
+              <input type="text" v-model="item.itemContent" />
             </tr>
           </table>
         </tr>
@@ -83,15 +80,18 @@ export default {
       requestBody: this.$route.query,
       idx: this.$route.query.idx,
       voteTitle: "",
-      vStartDTime: "",
-      vEndDTime: "",
-      voteItems: [],
+      startDate: "",
+      endDate: "",
+      itemContents: [],
     };
   },
   mounted() {
     this.fnGetView();
   },
   methods: {
+    deleteItem(index) {
+      this.itemContents.splice(index, 1);
+    },
     fnGetView() {
       this.axios
         .get(this.$serverUrl + "/vote/getDetailedVoteAgenda/", {
@@ -99,9 +99,9 @@ export default {
         })
         .then((res) => {
           this.voteTitle = res.data.voteTitle;
-          this.vStartDTime = res.data.vStartDTime;
-          this.vEndDTime = res.data.vEndDTime;
-          this.voteItems = res.data.voteItems;
+          this.startDate = res.data.vStartDTime;
+          this.endDate = res.data.vEndDTime;
+          this.itemContents = res.data.voteItems;
           this.voteEndFlag = res.data.voteEndFlag;
         })
         .catch((err) => {
@@ -139,10 +139,32 @@ export default {
     },
 
     fnUpdate() {
-      this.$router.push({
-        path: "./update",
-        query: this.requestBody,
-      });
+      let apiUrl = this.$serverUrl + "/vote/updateVoteAgenda";
+      this.form = {
+        idx: this.idx,
+        voteTitle: this.voteTitle,
+        startDate: this.startDate,
+        endDate: this.endDate,
+        itemContents: this.itemContents,
+      };
+
+      var result = confirm("수정하시겠습니까?");
+      if (result) {
+        this.axios
+          .put(apiUrl, this.form)
+          .then((res) => {
+            console.log("res.data.resultCode: " + res.data.resultCode);
+            if (res.data.resultCode == "00") {
+              alert("수정되었습니다.");
+              //this.fnList();
+            } else {
+              alert("수정되지 않았습니다.");
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
     },
     fnDelete() {
       var result = confirm("삭제하시겠습니까?");
