@@ -216,6 +216,12 @@ const routes = [
     meta: { requireLogin: true },
   },
   {
+    path: "/mngFee/insert",
+    name: "mngFeeInsert",
+    component: () => import("../views/mngFee-view/mngFeeInsert.vue"),
+    meta: { requireLogin: true },
+  },
+  {
     path: "/donghoInfo/list",
     name: "donghoInfoList",
     component: () => import("../views/donghoInfo/donghoInfoList.vue"),

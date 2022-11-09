@@ -177,6 +177,7 @@ export default {
       ho_items: [],
       items: [],
       disabled: 1,
+      fileType: 2,
     };
   },
   mounted() {
@@ -244,28 +245,18 @@ export default {
       }
     },
     onUpload() {
+      this.requestBody = {
+        fileType: this.fileType,
+      };
       const fd = new FormData();
       fd.append("file", this.selectedFile, this.selectedFile.name);
       this.axios
         .post(this.$serverUrl + "/fileUpload/file", fd, {
+          params: this.requestBody,
           responseType: "blob",
         })
         .then((res) => {
           console.log(res);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-    fnFileUpload() {
-      this.axios
-        .post(this.$serverUrl + "/fileUpload/file", this.file)
-        .then((res) => {
-          if (!res.data.file) {
-            alert("등록되었습니다.");
-          } else {
-            alert("등록되지 않았습니다.");
-          }
         })
         .catch((err) => {
           console.log(err);
