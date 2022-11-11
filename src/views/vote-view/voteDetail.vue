@@ -12,6 +12,10 @@
           <td class="title">{{ voteTitle }}</td>
         </tr>
         <tr>
+          <th scope="row">투표내용</th>
+          <td>{{ voteDesc }}</td>
+        </tr>
+        <tr>
           <th scope="row">시작일시</th>
           <td>{{ vStartDTime }}</td>
         </tr>
@@ -19,13 +23,11 @@
           <th scope="row">마감일시</th>
           <td>{{ vEndDTime }}</td>
         </tr>
+
         <tr>
           <th scope="row">항목</th>
           <table>
             <tr v-for="(item, index) in voteItems" v-bind:key="index">
-              <td>
-                <input type="checkbox" value="all" v-model="allSelected" />
-              </td>
               <td>{{ item.itemNo }}</td>
               <td>{{ item.itemContent }}</td>
             </tr>
@@ -83,6 +85,7 @@ export default {
       requestBody: this.$route.query,
       idx: this.$route.query.idx,
       voteTitle: "",
+      voteDesc: "",
       vStartDTime: "",
       vEndDTime: "",
       voteItems: [],
@@ -99,6 +102,7 @@ export default {
         })
         .then((res) => {
           this.voteTitle = res.data.voteTitle;
+          this.voteDesc = res.data.voteDesc;
           this.vStartDTime = res.data.vStartDTime;
           this.vEndDTime = res.data.vEndDTime;
           this.voteItems = res.data.voteItems;

@@ -9,15 +9,42 @@
       <tbody>
         <tr>
           <th scope="row">투표제목</th>
-          <td class="title">{{ voteTitle }}</td>
+          <td colspan="3">
+            <input
+              type="text"
+              rows="1"
+              ref="voteTitleInput"
+              v-model.trim="voteTitle"
+            />
+          </td>
         </tr>
         <tr>
-          <th scope="row">시작일시</th>
-          <td>{{ startDate }}</td>
+          <th scope="row">투표내용</th>
+          <td colspan="3">
+            <textarea
+              rows="2"
+              ref="voteDescInput"
+              v-model.trim="voteDesc"
+            ></textarea>
+          </td>
         </tr>
         <tr>
-          <th scope="row">마감일시</th>
-          <td>{{ endDate }}</td>
+          <th scope="row">투표기간</th>
+          <td>
+            <input
+              type="datetime-local"
+              style="width: 200px; text-align: center"
+              ref="startDateInput"
+              v-model.trim="startDate"
+            />
+            &nbsp; ~ &nbsp;
+            <input
+              type="datetime-local"
+              style="width: 200px; text-align: center"
+              ref="endDateInput"
+              v-model.trim="endDate"
+            />
+          </td>
         </tr>
         <tr>
           <th scope="row">항목</th>
@@ -48,25 +75,10 @@
       >&nbsp;
       <button
         type="button"
-        class="w3-button w3-round w3-blue"
-        v-on:click="fnVoteEnd"
-      >
-        투표마감</button
-      >&nbsp;
-      <button
-        type="button"
-        class="w3-button w3-round w3-green"
-        v-on:click="fnvoteResult"
-      >
-        결과보기
-      </button>
-      &nbsp;
-      <button
-        type="button"
         class="w3-button w3-round w3-black"
-        v-on:click="fnList"
+        v-on:click="fnView"
       >
-        종료</button
+        상세보기</button
       >&nbsp;
     </div>
   </div>
@@ -80,6 +92,7 @@ export default {
       requestBody: this.$route.query,
       idx: this.$route.query.idx,
       voteTitle: "",
+      voteDesc: "",
       startDate: "",
       endDate: "",
       itemContents: [],
@@ -99,6 +112,7 @@ export default {
         })
         .then((res) => {
           this.voteTitle = res.data.voteTitle;
+          this.voteDesc = res.data.voteDesc;
           this.startDate = res.data.vStartDTime;
           this.endDate = res.data.vEndDTime;
           this.itemContents = res.data.voteItems;
@@ -130,10 +144,10 @@ export default {
         });
       }
     },
-    fnList() {
-      delete this.requestBody.idx;
+    fnView() {
+      this.requestBody.idx;
       this.$router.push({
-        path: "./list",
+        path: "./detail",
         query: this.requestBody,
       });
     },
@@ -143,8 +157,8 @@ export default {
       this.form = {
         idx: this.idx,
         voteTitle: this.voteTitle,
-        startDate: this.startDate,
-        endDate: this.endDate,
+        startDate: this.startDate.replace("T", " "),
+        endDate: this.endDate.replace("T", " "),
         itemContents: this.itemContents,
       };
 
@@ -157,6 +171,8 @@ export default {
             if (res.data.resultCode == "00") {
               alert("수정되었습니다.");
               //this.fnList();
+            } else if (res.data.resultCode == "15") {
+              alert("진행또는 완료된 투표는 수정 하실수 없습니다.");
             } else {
               alert("수정되지 않았습니다.");
             }
@@ -176,6 +192,8 @@ export default {
             if (res.data.resultCode == "00") {
               alert("삭제되었습니다.");
               this.fnList();
+            } else if (res.data.resultCode == "15") {
+              alert("진행또는 완료된 투표는 삭제 하실수 없습니다.");
             } else {
               alert("삭제되지 않았습니다.");
             }

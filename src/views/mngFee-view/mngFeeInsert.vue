@@ -11,6 +11,46 @@
       </colgroup>
       <tbody>
         <tr>
+          <th scope="row">동호</th>
+          <td style="float: center">
+            <select
+              v-model="dongCode"
+              @change="onChange($event)"
+              style="width: 100px; height: 25px; text-align: center"
+            >
+              <option value="">---선택---</option>
+              <option value="ALL" :disabled="validated == 1">전체동</option>
+              <button @click="disabled = (disabled + 1) % 2">
+                Toggle Enable
+              </button>
+              <input type="text" :disabled="disabled == 1" />
+              <option
+                v-for="model in dong_items"
+                :key="model.code"
+                :value="model.code"
+              >
+                {{ model.name }}
+              </option>
+            </select>
+            동&nbsp;&nbsp;
+            <select
+              v-model="hoCode"
+              style="width: 100px; height: 25px; text-align: center"
+            >
+              <option value="">---선택---</option>
+              <option value="ALL">전체호</option>
+              <option
+                v-for="model in ho_items"
+                :key="model.code"
+                :value="model.code"
+              >
+                {{ model.name }}
+              </option>
+            </select>
+            호&nbsp;&nbsp;
+          </td>
+        </tr>
+        <tr>
           <th scope="row">고지서 날짜정보</th>
           <td style="float: center">
             <input
@@ -60,16 +100,50 @@ export default {
       mngFeeDate: "",
       file: "",
       fileType: 4,
+      dongCode: "",
+      hoCode: "",
+      dong_items: [],
+      ho_items: [],
+      items: [],
     };
   },
 
-  mounted() {},
+  mounted() {
+    this.fnGetDong();
+  },
   methods: {
+    fnGetDong() {
+      this.axios
+        .get(this.$serverUrl + "/donghoInfo/dongList")
+        .then((res) => {
+          this.dong_items = res.data.items;
+          //alert(JSON.stringify(this.items));
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    onChange(event) {
+      console.log("event =>" + event.target.value);
+      //alert(this.dongCode);
+      this.fnGetDongho(this.dongCode);
+    },
     onFileChange(event) {
       this.selectedFile = event.target.files[0];
       if (this.selectedFile != null) {
         this.onUpload();
       }
+    },
+    fnGetDongho(dongCode) {
+      this.axios
+        .get(this.$serverUrl + "/donghoInfo/donghoList?dongCode=" + dongCode)
+        .then((res) => {
+          this.ho_items = res.data.items;
+          //alert(JSON.stringify(this.items));
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
     onUpload() {
       this.requestBody = {
@@ -98,6 +172,12 @@ export default {
         alert("고지서 파일을 등록하세요");
         this.$refs.fileInput.focus();
         return;
+      } else if (this.dongCode == "") {
+        alert("동을 선택하세요");
+        return;
+      } else if (this.hoCode == "") {
+        alert("호를 선택하세요");
+        return;
       }
 
       const fd = new FormData();
@@ -106,6 +186,8 @@ export default {
       let apiUrl = this.$serverUrl + "/mngFee/postMngFee";
       this.form = {
         mngFeeDate: this.mngFeeDate,
+        dongCode: this.dongCode,
+        hoCode: this.hoCode,
       };
 
       var result = confirm("등록하시겠습니까?");
@@ -115,11 +197,7 @@ export default {
           .post(apiUrl, this.form)
           .then((res) => {
             console.log("res.data.resultCode: " + res.data.resultCode);
-            if (res.data.resultCode == "00") {
-              this.fnList();
-            } else {
-              alert("등록되지 않았습니다.");
-            }
+            this.fnList();
           })
           .catch((err) => {
             if (err.message.indexOf("Network Error") > -1) {

@@ -4,29 +4,48 @@
     <div class="common-buttons"></div>
     <table>
       <colgroup>
-        <col style="width: 15%" />
-        <col style="width: *" />
+        <col style="width: 10%" />
+        <col style="width: 50%" />
         <col style="width: 15%" />
         <col style="width: 45%" />
       </colgroup>
       <tbody>
         <tr>
-          <th scope="row">시작일</th>
-          <td>
-            <input type="text" ref="startDateInput" v-model.trim="startDate" />
-          </td>
-          <th scope="row">종료일</th>
-          <td>
-            <input type="text" ref="endDateInput" v-model.trim="endDate" />
+          <th scope="row">투표기간</th>
+          <td style="float: center">
+            <input
+              type="date"
+              style="width: 150px; text-align: center"
+              v-bind:disabled="moveOutDtime == ''"
+              v-model.trim="moveOutDtimeStart"
+            />
+            ~
+            <input
+              type="date"
+              style="width: 150px; text-align: center"
+              v-bind:disabled="moveOutDtime == ''"
+              v-model.trim="moveOutDtimeEnd"
+            />
           </td>
           <th scope="row">개표여부</th>
           <td>
-            <input
-              type="text"
-              ref="voteStatusInput"
-              v-model.trim="voteStatus"
-            />
+            <select
+              v-model="hnSendFlag"
+              style="width: 150px; height: 25px; text-align: center"
+            >
+              <option value="">----전체----</option>
+              <option value="Y">Y</option>
+              <option value="N">N</option>
+            </select>
           </td>
+        </tr>
+        <tr>
+          <th scope="row">투표제목</th>
+          <td>
+            <input type="text" />
+          </td>
+          <td></td>
+          <td></td>
         </tr>
         <tr>
           <th scope="row">검색단위</th>

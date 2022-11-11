@@ -87,6 +87,9 @@
   </div>
   <div class="buttons">
     <div class="right">
+      <button c class="w3-button w3-round w3-red" @click="fnDelete">
+        삭제
+      </button>
       <button class="button blue" @click="fnSearch">검색</button>
       <button class="button" @click="fnList">취소</button>
     </div>
@@ -124,10 +127,14 @@
           <div class="table-button-container">
             <button
               class="w3-button w3-round w3-green"
-              v-on:click="fnView(`${row.dongCode}`, 
-                                 `${row.hoCode}`,
-                                 `${row.mngYear}`,
-                                 `${row.mngMonth}`)"
+              v-on:click="
+                fnView(
+                  `${row.dongCode}`,
+                  `${row.hoCode}`,
+                  `${row.mngYear}`,
+                  `${row.mngMonth}`
+                )
+              "
             >
               <i class="fa fa-remove"></i>상세</button
             >&nbsp;&nbsp;
@@ -253,14 +260,33 @@ export default {
     },
     fnGetDongho(dongCode) {
       this.axios
-        .get(this.$serverUrl + "/donghoInfo/donghoList?dongCode=" 
-        + dongCode) 
+        .get(this.$serverUrl + "/donghoInfo/donghoList?dongCode=" + dongCode)
         .then((res) => {
           this.ho_items = res.data.items;
         })
         .catch((err) => {
           console.log(err);
         });
+    },
+    fnDelete() {
+      var result = confirm("삭제하시겠습니까?");
+      if (result) {
+        this.axios
+          .delete(this.$serverUrl + "/mngFee/deleteMngFeeList")
+          .then((res) => {
+            console.log("res.data.resultCode: " + res.data.resultCode);
+            if (res.data.resultCode == "00") {
+              alert("삭제되었습니다.");
+              //alert(JSON.stringify(res.data.resultMsg));
+              this.fnList();
+            } else {
+              alert("삭제되지 않았습니다.");
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
     },
     fnGethArea() {
       this.axios

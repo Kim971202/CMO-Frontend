@@ -156,7 +156,7 @@ export default {
           { responseType: "blob" }
         )
         .then((res) => {
-          alert("성공적으로 다운로드 하였습니다.");
+          alert("다운로드 하시겠습니까?");
           FileDownload(res.data, this.fileName);
           console.log(res);
         })
