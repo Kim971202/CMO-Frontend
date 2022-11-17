@@ -64,15 +64,15 @@
           <td></td>
           <td></td>
         </tr>
-        <tr>
+        <!-- <tr>
           <input
             type="file"
             @change="onFileChange"
             charset="UTF-8"
             id="images"
           />
-        </tr>
-        <tr>
+        </tr> -->
+        <!-- <tr>
           <th scope="row">동호</th>
           <td style="float: center">
             <select
@@ -111,8 +111,8 @@
             </select>
             호&nbsp;&nbsp;
           </td>
-        </tr>
-        <tr>
+        </tr> -->
+        <!-- <tr>
           <div>
             <div class="text-uppercase text-bold">
               선택한 세대의 호: {{ hoCode }}
@@ -132,8 +132,14 @@
               </tr>
             </table>
           </div>
-        </tr>
+        </tr> -->
       </tbody>
+    </table>
+    <table>
+      <tr v-for="(row, i) in list" :key="i">
+        <td>{{ row.dongCode }}</td>
+        <td>{{ row.hoCode }}</td>
+      </tr>
     </table>
     <div class="common-buttons">
       <button
@@ -163,27 +169,32 @@ export default {
       input: "text",
       tableShow: true,
       requestBody: this.$route.query,
-      parcelStatus: "",
       dongCode: "",
       hoCode: [],
-      parcelCorp: "",
-      parcelBoxNo: "",
-      mailBoxNo: "",
-      receiver: "",
-      delFee: "",
-      UserID: this.$store.state.loginStore.memberId,
       file: "",
       dong_items: [],
       ho_items: [],
       items: [],
+      list: {},
       disabled: 1,
       fileType: 2,
     };
   },
   mounted() {
     this.fnGetDong();
+    this.fnGetNoticeTable();
   },
   methods: {
+    fnGetNoticeTable() {
+      this.axios
+        .get(this.$serverUrl + "/notice/noticeTable")
+        .then((res) => {
+          this.list = res.data.list;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
     changeColor() {
       alert(this.color);
     },

@@ -4,35 +4,42 @@
     <table>
       <colgroup>
         <col style="width: 18.5%" />
-        <col style="width: " />
+        <col style="width: *" />
       </colgroup>
       <tbody>
         <tr>
           <th scope="row">투표제목</th>
           <td class="title">{{ voteTitle }}</td>
+          <td></td>
         </tr>
         <tr>
           <th scope="row">투표내용</th>
           <td>{{ voteDesc }}</td>
+          <td></td>
         </tr>
         <tr>
           <th scope="row">시작일시</th>
           <td>{{ vStartDTime }}</td>
+          <td></td>
         </tr>
         <tr>
           <th scope="row">마감일시</th>
           <td>{{ vEndDTime }}</td>
+          <td></td>
         </tr>
-
-        <tr>
-          <th scope="row">항목</th>
-          <table>
-            <tr v-for="(item, index) in voteItems" v-bind:key="index">
-              <td>{{ item.itemNo }}</td>
-              <td>{{ item.itemContent }}</td>
-            </tr>
-          </table>
+      </tbody>
+      <tbody>
+        <th rowspan="6">항목</th>
+        <tr v-for="(item, index) in voteItems" v-bind:key="index">
+          <td>{{ item.itemNo }}</td>
+          <td>{{ item.itemContent }}</td>
         </tr>
+        <colgroup>
+          <col style="width: 15%" />
+          <col style="width: 15%" />
+          <col style="width: *" />
+          <col style="width: *" />
+        </colgroup>
       </tbody>
     </table>
 
@@ -95,6 +102,13 @@ export default {
     this.fnGetView();
   },
   methods: {
+    fnGetDate() {
+      let checkDate = new Date();
+      checkDate.toISOString().split("T")[0];
+      const offset = checkDate.getTimezoneOffset();
+      checkDate = new Date(checkDate.getTime() - offset * 60 * 1000);
+      return checkDate.toISOString().split("T")[0];
+    },
     fnGetView() {
       this.axios
         .get(this.$serverUrl + "/vote/getDetailedVoteAgenda/", {
@@ -143,31 +157,45 @@ export default {
     },
 
     fnUpdate() {
-      this.$router.push({
-        path: "./update",
-        query: this.requestBody,
-      });
+      if (this.vStartDTime > this.fnGetDate()) {
+        this.$router.push({
+          path: "./update",
+          query: this.requestBody,
+        });
+      } else {
+        alert("진행중이거나 종료된 투표는 수정 할수없습니다.");
+      }
     },
     fnDelete() {
-      var result = confirm("삭제하시겠습니까?");
-      if (result) {
-        this.axios
-          .delete(this.$serverUrl + "/vote/deleteVoteAgenda/" + this.idx, {})
-          .then((res) => {
-            console.log("res.data.resultCode: " + res.data.resultCode);
-            if (res.data.resultCode == "00") {
-              alert("삭제되었습니다.");
-              this.fnList();
-            } else {
-              alert("삭제되지 않았습니다.");
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+      if (this.vStartDTime > this.fnGetDate()) {
+        var result = confirm("삭제하시겠습니까?");
+        if (result) {
+          this.axios
+            .delete(this.$serverUrl + "/vote/deleteVoteAgenda/" + this.idx, {})
+            .then((res) => {
+              console.log("res.data.resultCode: " + res.data.resultCode);
+              if (res.data.resultCode == "00") {
+                alert("삭제되었습니다.");
+                this.fnList();
+              } else {
+                alert("삭제되지 않았습니다.");
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
+      } else {
+        alert("진행중이거나 종료된 투표는 삭제 할수없습니다.");
       }
     },
   },
 };
 </script>
-<style scoped></style>
+<style scoped>
+.board table {
+  width: 100%;
+  border-top: 2px solid #1d4281;
+  border-spacing: 0;
+}
+</style>

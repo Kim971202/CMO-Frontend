@@ -9,13 +9,18 @@
       >
         신규
       </button>
+      <button c class="w3-button w3-round w3-red" @click="fnDelete">
+        삭제
+      </button>
     </div>
     <table>
       <colgroup>
-        <col style="width: 15%" />
-        <col style="width: *" />
-        <col style="width: 15%" />
-        <col style="width: 45%" />
+        <col style="width: 10%" />
+        <col style="width: 70%" />
+        <col style="width: 50%" />
+        <col style="width: 30%" />
+        <col style="width: 10%" />
+        <col style="width: 10%" />
       </colgroup>
       <tbody>
         <tr>
@@ -69,6 +74,17 @@
           </td>
         </tr>
         <tr>
+          <th scope="row">관리비 청구 년월</th>
+          <td style="float: center">
+            <input
+              type="month"
+              style="width: 150px; text-align: center"
+              v-bind:disabled="moveOutDtime == ''"
+              v-model.trim="moveOutDtimeStart"
+            />
+          </td>
+        </tr>
+        <tr>
           <th scope="row">검색단위</th>
           <td>
             <input
@@ -87,9 +103,6 @@
   </div>
   <div class="buttons">
     <div class="right">
-      <button c class="w3-button w3-round w3-red" @click="fnDelete">
-        삭제
-      </button>
       <button class="button blue" @click="fnSearch">검색</button>
       <button class="button" @click="fnList">취소</button>
     </div>
